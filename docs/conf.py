@@ -51,8 +51,8 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = u'dropafile'
-copyright = u'2015, Uli Fouquet'
+project = 'dropafile'
+copyright = '2015, Uli Fouquet'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -223,8 +223,8 @@ latex_elements = {
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-  ('index', 'dropafile.tex', u'dropafile Documentation',
-   u'Uli Fouquet', 'manual'),
+  ('index', 'dropafile.tex', 'dropafile Documentation',
+   'Uli Fouquet', 'manual'),
 ]
 
 # The name of an image file (relative to this directory) to place at the top of
@@ -253,8 +253,8 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    ('index', 'dropafile', u'dropafile Documentation',
-     [u'Uli Fouquet'], 1)
+    ('index', 'dropafile', 'dropafile Documentation',
+     ['Uli Fouquet'], 1)
 ]
 
 # If true, show URL addresses after external links.
@@ -267,8 +267,8 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-  ('index', 'dropafile', u'dropafile Documentation',
-   u'Uli Fouquet', 'dropafile', 'One line description of project.',
+  ('index', 'dropafile', 'dropafile Documentation',
+   'Uli Fouquet', 'dropafile', 'One line description of project.',
    'Miscellaneous'),
 ]
 
@@ -288,13 +288,13 @@ texinfo_documents = [
 # -- Options for Epub output ----------------------------------------------
 
 # Bibliographic Dublin Core info.
-epub_title = u'dropafile'
-epub_author = u'Uli Fouquet'
-epub_publisher = u'Uli Fouquet'
-epub_copyright = u'2015, Uli Fouquet'
+epub_title = 'dropafile'
+epub_author = 'Uli Fouquet'
+epub_publisher = 'Uli Fouquet'
+epub_copyright = '2015, Uli Fouquet'
 
 # The basename for the epub file. It defaults to the project name.
-#epub_basename = u'dropafile'
+#epub_basename = 'dropafile'
 
 # The HTML theme for the epub output. Since the default themes are not optimized
 # for small screen space, using the same theme for HTML and epub output is
