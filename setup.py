@@ -37,7 +37,7 @@ setup(
     author_email="uli@gnufix.de",
     description=(
         "Drop me a file on a webpage."),
-    license="MIT",
+    license="GPL 3.0",
     keywords="web drop file wsgi",
     url="https://github.com/ulif/dropafile/",
     py_modules=['dropafile', ],
@@ -52,7 +52,7 @@ setup(
         "Intended Audience :: System Administrators",
         "Topic :: Internet :: WWW/HTTP :: WSGI :: Application",
         "Topic :: Internet :: WWW/HTTP :: Dynamic Content :: CGI Tools/Libraries",
-        "License :: OSI Approved :: MIT License",
+        "License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)",
         "Operating System :: POSIX :: Linux",
         "Programming Language :: Python :: 2",
         "Programming Language :: Python :: 2.7",
