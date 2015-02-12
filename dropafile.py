@@ -16,6 +16,8 @@
 """Drop a file on a webpage.
 """
 import os
+import sys
+from werkzeug.serving import run_simple
 from werkzeug.wrappers import Request, Response
 
 
@@ -24,3 +26,9 @@ def application(request):
     with open(os.path.join(os.path.dirname(__file__), 'page.html')) as fd:
         page_html = fd.read()
     return Response(page_html, mimetype="text/html")
+
+
+def run_server(args=None):
+    if args is None:
+        args = sys.argv
+    run_simple('localhost', 8080, application)
