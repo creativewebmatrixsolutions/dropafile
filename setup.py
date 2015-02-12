@@ -5,17 +5,20 @@ from setuptools.command.test import test as TestCommand
 
 tests_path = os.path.join(os.path.dirname(__file__), 'tests')
 
+
 class PyTest(TestCommand):
     def finalize_options(self):
         TestCommand.finalize_options(self)
-        args = sys.argv[sys.argv.index('test')+1:]
+        args = sys.argv[sys.argv.index('test') + 1:]
         self.test_args = args
         self.test_suite = True
+
     def run_tests(self):
         #import here, cause outside the eggs aren't loaded
         import pytest
         errno = pytest.main(self.test_args)
         sys.exit(errno)
+
 
 def read(fname):
     return open(os.path.join(os.path.dirname(__file__), fname)).read()
@@ -55,8 +58,12 @@ setup(
         "Intended Audience :: End Users/Desktop",
         "Intended Audience :: System Administrators",
         "Topic :: Internet :: WWW/HTTP :: WSGI :: Application",
-        "Topic :: Internet :: WWW/HTTP :: Dynamic Content :: CGI Tools/Libraries",
-        "License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)",
+        (
+            "Topic :: Internet :: WWW/HTTP :: Dynamic Content :: "
+            "CGI Tools/Libraries"),
+        (
+            "License :: OSI Approved :: "
+            "GNU General Public License v3 or later (GPLv3+)"),
         "Operating System :: POSIX :: Linux",
         "Programming Language :: Python :: 2",
         "Programming Language :: Python :: 2.7",
