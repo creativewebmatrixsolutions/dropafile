@@ -15,3 +15,12 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """Drop a file on a webpage.
 """
+import os
+from werkzeug.wrappers import Request, Response
+
+
+@Request.application
+def application(request):
+    with open(os.path.join(os.path.dirname(__file__), 'page.html')) as fd:
+        page_html = fd.read()
+    return Response(page_html, mimetype="text/html")
