@@ -80,7 +80,7 @@ setup(
     cmdclass={'test': PyTest},
     entry_points={
         'console_scripts': [
-            # 'dropafile = dropafile:main',
+            'dropafile = dropafile:run_server',
         ]
         }
 )
