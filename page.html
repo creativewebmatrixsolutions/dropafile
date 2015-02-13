@@ -3,20 +3,12 @@
   <head>
     <meta charset="utf-8" />
     <title>Drop a file</title>
-    <style type="text/css">
-      #dropspace{
-        width:200px;
-        height:200px;
-        border:3px dotted #333;
-        border-radius: 100px;
-        text-align: center;
-        line-height: 200px;
-      }
-    </style>
+    <script src="/dropzone.js" type="text/javascript"></script>
+    <link rel="stylesheet" href="/dropzone.css"></link>
   </head>
   <body>
-    <div id="dropspace">
-      Drop your file here
-    </div>
+    <form action="/upload-target" class="dropzone">
+      Drop your files here
+    </form>
   </body>
 </html>
