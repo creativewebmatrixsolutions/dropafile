@@ -21,11 +21,22 @@ from werkzeug.serving import run_simple
 from werkzeug.wrappers import Request, Response
 
 
+PATH_MAP = {
+    '/dropzone.js': ('dropzone.js', 'text/javascript'),
+    '/dropzone.css': ('dropzone.css', 'text/css'),
+    '/index.html': ('page.html', 'text/html'),
+    }
+
+
 @Request.application
 def application(request):
-    with open(os.path.join(os.path.dirname(__file__), 'page.html')) as fd:
-        page_html = fd.read()
-    return Response(page_html, mimetype="text/html")
+    path = request.path
+    if path not in PATH_MAP.keys():
+        path = '/index.html'
+    filename, mimetype = PATH_MAP[path]
+    with open(os.path.join(os.path.dirname(__file__), filename)) as fd:
+        page = fd.read()
+    return Response(page, mimetype=mimetype)
 
 
 def run_server(args=None):
