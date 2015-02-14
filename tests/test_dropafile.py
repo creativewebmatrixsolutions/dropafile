@@ -1,4 +1,5 @@
 # tests for dropafile module.
+from io import BytesIO
 from werkzeug.test import Client
 from werkzeug.wrappers import BaseResponse
 from dropafile import application
@@ -29,3 +30,15 @@ def test_get_css():
     assert resp.status == '200 OK'
     mimetype = resp.headers.get('Content-Type')
     assert mimetype == 'text/css; charset=utf-8'
+
+
+def test_send_file():
+    # we can send files
+    client = Client(application, BaseResponse)
+    resp = client.post(
+        '/index.html',
+        data={
+            'file': (BytesIO(b'Some Content'), 'sample.txt'),
+            },
+        )
+    assert resp.status == '200 OK'
