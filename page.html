@@ -7,11 +7,32 @@
     <script type="text/javascript">
       Dropzone.options.theZone  = {
         paramName: "file",
-        dictDefaultMessage: "Drop me a little file here :-)",
+        dictDefaultMessage: "<h1><small>Drop me a little file here :-)</small></h1>",
         addRemoveLinks: true,
       };
     </script>
     <link rel="stylesheet" href="/dropzone.css"></link>
+
+    <!-- tw bootstrap from getbootstrap.com -->
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css">
+    <!-- Optional theme -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap-theme.min.css">
+
+    <!-- Custom styles -->
+    <style>
+      .dropzone {
+        background-color: #ddd;
+        border-style: dotted;
+        border-width: 2px;
+        padding: 5px;
+      }
+      .dropzone:hover {
+        background-color: #dde;
+      }
+    </style>
+
+
   </head>
   <body>
     <form id="the-zone" class="dropzone" action="index.html">
