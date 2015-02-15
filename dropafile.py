@@ -49,9 +49,14 @@ def execute_cmd(cmd_list):
     Returns stdout and stderr output.
     """
     pipe = subprocess.PIPE
-    with subprocess.Popen(
-        cmd_list, stdout=pipe, stderr=pipe, shell=False) as proc:
+    proc = subprocess.Popen(
+        cmd_list, stdout=pipe, stderr=pipe, shell=False)
+    try:
         stdout, stderr = proc.communicate()
+    finally:
+        proc.stdout.close()
+        proc.stderr.close()
+        proc.wait()
     return stdout, stderr
 
 
