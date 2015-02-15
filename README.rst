@@ -18,6 +18,11 @@ As a user, run::
 
   $ pip install dropafile
 
+then, start the local server::
+
+  $ dropafile
+
+
 
 Developer Install
 -----------------
