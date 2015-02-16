@@ -29,6 +29,7 @@ PATH_MAP = {
     '/dropzone.js': ('dropzone.js', 'text/javascript'),
     '/dropzone.css': ('dropzone.css', 'text/css'),
     '/index.html': ('page.html', 'text/html'),
+    '/login.html': ('login.html', 'text/html'),
     }
 
 
@@ -36,7 +37,7 @@ PATH_MAP = {
 def application(request):
     path = request.path
     if path not in PATH_MAP.keys():
-        path = '/index.html'
+        path = '/login.html'
     filename, mimetype = PATH_MAP[path]
     with open(os.path.join(os.path.dirname(__file__), filename)) as fd:
         page = fd.read()

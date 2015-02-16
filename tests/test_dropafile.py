@@ -18,6 +18,13 @@ def test_page_response():
     assert mimetype == 'text/html; charset=utf-8'
 
 
+def test_page_default_is_login():
+    # we get the login page by default
+    client = Client(application, BaseResponse)
+    resp = client.get('/')
+    assert b'Passphrase' in resp.data
+
+
 def test_get_js():
     # we can get the dropzonejs JavaScript
     client = Client(application, BaseResponse)
