@@ -51,15 +51,17 @@ def get_random_password():
         [rnd.choice(ALLOWED_PWD_CHARS) for x in range(23)])
 
 
-@Request.application
-def application(request):
-    path = request.path
-    if path not in PATH_MAP.keys():
-        path = '/login.html'
-    filename, mimetype = PATH_MAP[path]
-    with open(os.path.join(os.path.dirname(__file__), filename)) as fd:
-        page = fd.read()
-    return Response(page, mimetype=mimetype)
+class DropAFileApplication(object):
+
+    @Request.application
+    def __call__(self, request):
+        path = request.path
+        if path not in PATH_MAP.keys():
+            path = '/login.html'
+        filename, mimetype = PATH_MAP[path]
+        with open(os.path.join(os.path.dirname(__file__), filename)) as fd:
+            page = fd.read()
+        return Response(page, mimetype=mimetype)
 
 
 def execute_cmd(cmd_list):
@@ -112,6 +114,7 @@ def run_server(args=None):
     ssl_context.options |= ssl.OP_NO_SSLv2  # considered unsafe
     ssl_context.options |= ssl.OP_NO_SSLv3  # considered unsafe
     ssl_context.load_cert_chain(cert, key)
+    application = DropAFileApplication()
     run_simple('localhost', 8443, application, ssl_context=ssl_context)
     if temp_cert:
         shutil.rmtree(os.path.dirname(cert))

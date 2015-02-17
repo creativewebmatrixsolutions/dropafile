@@ -9,13 +9,14 @@ from io import BytesIO
 from werkzeug.test import Client
 from werkzeug.wrappers import BaseResponse
 from dropafile import (
-    application, execute_cmd, create_ssl_cert, get_random_password,
-    ALLOWED_PWD_CHARS
+    DropAFileApplication, execute_cmd, create_ssl_cert, get_random_password,
+    ALLOWED_PWD_CHARS,
     )
 
 
 def test_page_response():
     # we get some HTML page by default
+    application = DropAFileApplication()
     client = Client(application, BaseResponse)
     resp = client.get('/')
     assert resp.status == '200 OK'
@@ -25,6 +26,7 @@ def test_page_response():
 
 def test_page_default_is_login():
     # we get the login page by default
+    application = DropAFileApplication()
     client = Client(application, BaseResponse)
     resp = client.get('/')
     assert b'Passphrase' in resp.data
@@ -32,6 +34,7 @@ def test_page_default_is_login():
 
 def test_get_js():
     # we can get the dropzonejs JavaScript
+    application = DropAFileApplication()
     client = Client(application, BaseResponse)
     resp = client.get('dropzone.js')
     assert resp.status == '200 OK'
@@ -41,6 +44,7 @@ def test_get_js():
 
 def test_get_css():
     # we can get the dropzonejs CSS
+    application = DropAFileApplication()
     client = Client(application, BaseResponse)
     resp = client.get('dropzone.css')
     assert resp.status == '200 OK'
@@ -50,6 +54,7 @@ def test_get_css():
 
 def test_send_file():
     # we can send files
+    application = DropAFileApplication()
     client = Client(application, BaseResponse)
     resp = client.post(
         '/index.html',
