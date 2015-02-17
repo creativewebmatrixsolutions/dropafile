@@ -54,6 +54,11 @@ def get_random_password():
 class DropAFileApplication(object):
 
     def __init__(self, password=None):
+        """Drop-A-File application.
+
+        `password` is required to access the application's service. If
+        none is provided, we generate one for you.
+        """
         if password is None:
             password = get_random_password()
         self.password = password
