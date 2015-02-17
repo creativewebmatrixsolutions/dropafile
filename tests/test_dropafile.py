@@ -103,3 +103,16 @@ def test_get_random_password_entropy():
     entropy_per_char = math.log(len(unique_chars)) / math.log(2)
     password = get_random_password()
     assert len(password) * entropy_per_char >= 128
+
+
+def test_app_has_password():
+    # DropAFileApplications have a password
+    app = DropAFileApplication()
+    assert hasattr(app, 'password')
+    assert len(app.password) > 5
+
+
+def test_app_accepts_passwod():
+    # DropAFileApps accept passwords passed in
+    app = DropAFileApplication(password='verysecret')
+    assert app.password == 'verysecret'
