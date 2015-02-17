@@ -16,6 +16,7 @@
 """Drop a file on a webpage.
 """
 import os
+import random
 import shutil
 import ssl
 import subprocess
@@ -31,6 +32,23 @@ PATH_MAP = {
     '/index.html': ('page.html', 'text/html'),
     '/login.html': ('login.html', 'text/html'),
     }
+
+
+#: Chars allowed in passwords.
+#: We allow plain ASCII chars and numbers, with some entitites removed,
+#: that can be easily mixed up: letter `l` and number one, for instance.
+ALLOWED_PWD_CHARS = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789abcdefghjkmnpqrstuvwxyz'
+
+
+def get_random_password():
+    """Get a password generated from `ALLOWED_PWD_CHARS`.
+
+    The password entropy should be >= 128 bits. We use `SystemRandom()`,
+    which should provide enough randomness to work properly.
+    """
+    rnd = random.SystemRandom()
+    return ''.join(
+        [rnd.choice(ALLOWED_PWD_CHARS) for x in range(23)])
 
 
 @Request.application

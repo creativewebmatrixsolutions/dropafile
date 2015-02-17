@@ -1,12 +1,17 @@
 # tests for dropafile module.
+import math
 import os
 import pytest
+import re
 import shutil
 import tempfile
 from io import BytesIO
 from werkzeug.test import Client
 from werkzeug.wrappers import BaseResponse
-from dropafile import application, execute_cmd, create_ssl_cert
+from dropafile import (
+    application, execute_cmd, create_ssl_cert, get_random_password,
+    ALLOWED_PWD_CHARS
+    )
 
 
 def test_page_response():
@@ -78,3 +83,18 @@ def test_create_cert_no_path():
     cert_path, key_path = create_ssl_cert()
     assert os.path.isfile(cert_path)
     shutil.rmtree(os.path.dirname(cert_path))
+
+
+def test_get_random_password():
+    # we can get a random password
+    allowed_chars = '[A-HJ-NP-Z2-9a-hjkmnp-z]'
+    RE_PWD=re.compile('^%s+$' % allowed_chars)
+    password = get_random_password()
+    assert RE_PWD.match(password)
+
+def test_get_random_password_entropy():
+    # the entropy delivered by default >= 128 bits
+    unique_chars = ''.join(list(set(ALLOWED_PWD_CHARS)))
+    entropy_per_char = math.log(len(unique_chars)) / math.log(2)
+    password = get_random_password()
+    assert len(password) * entropy_per_char >= 128
