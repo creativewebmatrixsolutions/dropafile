@@ -4,7 +4,6 @@ import os
 import pytest
 import re
 import shutil
-import tempfile
 from io import BytesIO
 from werkzeug.test import Client
 from werkzeug.wrappers import BaseResponse
@@ -93,9 +92,10 @@ def test_create_cert_no_path():
 def test_get_random_password():
     # we can get a random password
     allowed_chars = '[A-HJ-NP-Z2-9a-hjkmnp-z]'
-    RE_PWD=re.compile('^%s+$' % allowed_chars)
+    RE_PWD = re.compile('^%s+$' % allowed_chars)
     password = get_random_password()
     assert RE_PWD.match(password)
+
 
 def test_get_random_password_entropy():
     # the entropy delivered by default >= 128 bits
