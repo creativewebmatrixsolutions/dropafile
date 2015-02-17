@@ -55,7 +55,7 @@ class DropAFileApplication(object):
 
     def __init__(self, password=None):
         if password is None:
-            password=get_random_password()
+            password = get_random_password()
         self.password = password
 
     @Request.application
