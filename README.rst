@@ -3,7 +3,7 @@ dropafile
 
 Drop me a file, securely.
 
-.. |build-status|_
+|build-status|_
 
 .. |build-status| image:: https://travis-ci.org/ulif/dropafile.png?branch=master
 .. _build-status: https://travis-ci.org/ulif/dropafile
