@@ -1,10 +1,12 @@
 # tests for dropafile module.
+import base64
 import math
 import os
 import pytest
 import re
 import shutil
 from io import BytesIO
+from werkzeug.datastructures import Headers
 from werkzeug.test import Client
 from werkzeug.wrappers import BaseResponse
 from dropafile import (
@@ -13,11 +15,21 @@ from dropafile import (
     )
 
 
+def get_basic_auth_headers(name='somename', password=''):
+    headers = Headers()
+    auth_string = '%s:%s' % (name, password)
+    enc_auth_string = base64.b64encode(auth_string.encode('utf-8'))
+    headers.add('Authorization', 'Basic %s' % enc_auth_string.decode('utf-8'))
+    return headers
+
+
 def test_page_response():
-    # we get some HTML page by default
+    # we can get some HTML page for any path
     application = DropAFileApplication()
     client = Client(application, BaseResponse)
-    resp = client.get('/')
+    headers = get_basic_auth_headers(
+        name='somename', password=application.password)
+    resp = client.get('/', headers=headers)
     assert resp.status == '200 OK'
     mimetype = resp.headers.get('Content-Type')
     assert mimetype == 'text/html; charset=utf-8'
@@ -27,7 +39,9 @@ def test_page_default_is_login():
     # we get the login page by default
     application = DropAFileApplication()
     client = Client(application, BaseResponse)
-    resp = client.get('/')
+    headers = get_basic_auth_headers(
+        name='somename', password=application.password)
+    resp = client.get('/', headers=headers)
     assert b'Passphrase' in resp.data
 
 
@@ -35,7 +49,9 @@ def test_get_js():
     # we can get the dropzonejs JavaScript
     application = DropAFileApplication()
     client = Client(application, BaseResponse)
-    resp = client.get('dropzone.js')
+    headers = get_basic_auth_headers(
+        name='somename', password=application.password)
+    resp = client.get('dropzone.js', headers=headers)
     assert resp.status == '200 OK'
     mimetype = resp.headers.get('Content-Type')
     assert mimetype == 'text/javascript; charset=utf-8'
@@ -45,7 +61,9 @@ def test_get_css():
     # we can get the dropzonejs CSS
     application = DropAFileApplication()
     client = Client(application, BaseResponse)
-    resp = client.get('dropzone.css')
+    headers = get_basic_auth_headers(
+        name='somename', password=application.password)
+    resp = client.get('dropzone.css', headers=headers)
     assert resp.status == '200 OK'
     mimetype = resp.headers.get('Content-Type')
     assert mimetype == 'text/css; charset=utf-8'
@@ -55,8 +73,11 @@ def test_send_file():
     # we can send files
     application = DropAFileApplication()
     client = Client(application, BaseResponse)
+    headers = get_basic_auth_headers(
+        name='somename', password=application.password)
     resp = client.post(
         '/index.html',
+        headers=headers,
         data={
             'file': (BytesIO(b'Some Content'), 'sample.txt'),
             },
