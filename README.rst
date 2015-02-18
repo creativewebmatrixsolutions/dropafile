@@ -1,7 +1,7 @@
 dropafile
 =========
 
-Drop me a file on a webpage.
+Drop me a file, securely.
 
 .. |build-status|_
 
@@ -9,7 +9,7 @@ Drop me a file on a webpage.
 .. .. _build-status: https://travis-ci.org/ulif/dropafile
 
 
-`dropafile` provides a page to drop files into a local file.
+`dropafile` provides a webapp where users can drop files.
 
 Install
 -------
@@ -21,7 +21,21 @@ As a user, run::
 then, start the local server::
 
   $ dropafile
+  Creating temporary self-signed SSL certificate...
+  Done.
+  Certificate in: /tmp/tmp1y2bgh/cert.pem
+  Key in:         /tmp/tmp1y2bgh/cert.key
+  Password is: H93rqnsrdEXD2ad3rQwdWqZ
+   * Running on https://localhost:8443/ (Press CTRL+C to quit)
 
+The server will provide SSL. Users can access `dropafile` sevice
+pointing their browsers to the location given. They will have to
+provide the password displayed (which changes with restart).
+
+`dropafile` is meant as a channel to deliver documents in a not too
+unsecure manner. For instance as a quickly installable workaround if
+people are not able or willing to use GnuPG or similar, although they
+have sensible documents to send.
 
 
 Developer Install
