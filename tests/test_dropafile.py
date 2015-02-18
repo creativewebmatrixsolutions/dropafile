@@ -35,16 +35,6 @@ def test_page_response():
     assert mimetype == 'text/html; charset=utf-8'
 
 
-def test_page_default_is_login():
-    # we get the login page by default
-    application = DropAFileApplication()
-    client = Client(application, BaseResponse)
-    headers = get_basic_auth_headers(
-        name='somename', password=application.password)
-    resp = client.get('/', headers=headers)
-    assert b'Passphrase' in resp.data
-
-
 def test_get_js():
     # we can get the dropzonejs JavaScript
     application = DropAFileApplication()
