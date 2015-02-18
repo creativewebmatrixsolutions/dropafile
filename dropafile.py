@@ -22,6 +22,7 @@ import ssl
 import subprocess
 import sys
 import tempfile
+from werkzeug.exceptions import Unauthorized
 from werkzeug.serving import run_simple
 from werkzeug.wrappers import Request, Response
 
@@ -63,11 +64,37 @@ class DropAFileApplication(object):
             password = get_random_password()
         self.password = password
 
+    def check_auth(self, request):
+        """Check basic auth against local password.
+
+        We accept all usernames, but only _the_ password.
+        """
+        auth = request.authorization
+        if auth is None:
+            return False
+        if auth.password != self.password:
+            return False
+        return True
+
+    def authenticate(self):
+        """Send 401 requesting basic auth from client.
+        """
+        return Response(
+            '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">\n'
+            '<title>401 Unauthorized</title>\n'
+            '<h1>Unauthorized</h1>'
+            '<p>You are not authorized to use this service.</p>',
+            401, {'WWW-Authenticate': 'Basic realm="Login required"',
+                  'Content-Type': 'text/html'}
+            )
+
     @Request.application
     def __call__(self, request):
+        if not self.check_auth(request):
+            return self.authenticate()
         path = request.path
         if path not in PATH_MAP.keys():
-            path = '/login.html'
+            path = '/index.html'
         filename, mimetype = PATH_MAP[path]
         with open(os.path.join(os.path.dirname(__file__), filename)) as fd:
             page = fd.read()
