@@ -116,3 +116,20 @@ def test_app_accepts_passwod():
     # DropAFileApps accept passwords passed in
     app = DropAFileApplication(password='verysecret')
     assert app.password == 'verysecret'
+
+
+def test_unauthorized_by_default():
+    # By default we get an Unauthorized message
+    app = DropAFileApplication()
+    client = Client(app, BaseResponse)
+    resp = client.get('/')
+    assert resp.status == '401 UNAUTHORIZED'
+
+
+def test_basic_auth_req_by_default():
+    # By default we require basic auth from client
+    app = DropAFileApplication()
+    client = Client(app, BaseResponse)
+    resp = client.get('/')
+    header = resp.headers.get('WWW-Authenticate', None)
+    assert header is not None
