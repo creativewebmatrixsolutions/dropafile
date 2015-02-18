@@ -22,7 +22,6 @@ import ssl
 import subprocess
 import sys
 import tempfile
-from werkzeug.exceptions import Unauthorized
 from werkzeug.serving import run_simple
 from werkzeug.wrappers import Request, Response
 
