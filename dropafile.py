@@ -31,7 +31,6 @@ PATH_MAP = {
     '/dropzone.js': ('dropzone.js', 'text/javascript'),
     '/dropzone.css': ('dropzone.css', 'text/css'),
     '/index.html': ('page.html', 'text/html'),
-    '/login.html': ('login.html', 'text/html'),
     }
 
 
