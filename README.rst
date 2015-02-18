@@ -65,3 +65,6 @@ run by::
 
   (py27) $ pip install tox  # neccessary only once per virtualenv
   (py27) $ tox
+
+
+.. _virtualenv: https://virtualenv.pypa.io/
