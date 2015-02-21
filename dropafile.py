@@ -15,6 +15,7 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """Drop a file on a webpage.
 """
+import argparse
 import os
 import random
 import shutil
@@ -37,6 +38,14 @@ PATH_MAP = {
 #: We allow plain ASCII chars and numbers, with some entitites removed,
 #: that can be easily mixed up: letter `l` and number one, for instance.
 ALLOWED_PWD_CHARS = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789abcdefghjkmnpqrstuvwxyz'
+
+
+def handle_options(args):
+    """Handle commandline options.
+    """
+    parser = argparse.ArgumentParser(description="Start dropafile app.")
+    opts = parser.parse_args(args)
+    return opts
 
 
 def get_random_password():

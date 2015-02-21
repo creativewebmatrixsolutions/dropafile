@@ -11,7 +11,7 @@ from werkzeug.test import Client
 from werkzeug.wrappers import BaseResponse
 from dropafile import (
     DropAFileApplication, execute_cmd, create_ssl_cert, get_random_password,
-    ALLOWED_PWD_CHARS,
+    ALLOWED_PWD_CHARS, handle_options
     )
 
 
@@ -144,3 +144,13 @@ def test_basic_auth_req_by_default():
     resp = client.get('/')
     header = resp.headers.get('WWW-Authenticate', None)
     assert header is not None
+
+
+class TestArgParser(object):
+
+    def test_help(self, capsys):
+        # we support --help
+        with pytest.raises(SystemExit) as exc_info:
+            handle_options(['foo', '--help'])
+        out, err = capsys.readouterr()
+        assert exc_info.value.code == 0
