@@ -154,3 +154,8 @@ class TestArgParser(object):
             handle_options(['foo', '--help'])
         out, err = capsys.readouterr()
         assert exc_info.value.code == 0
+
+    def test_defaults(self):
+        # we can get options with defaults set
+        result = handle_options([])
+        assert result is not None
