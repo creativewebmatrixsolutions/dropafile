@@ -7,19 +7,26 @@ import re
 import shutil
 from io import BytesIO
 from werkzeug.datastructures import Headers
-from werkzeug.test import Client
-from werkzeug.wrappers import BaseResponse
+from werkzeug.test import Client, create_environ
+from werkzeug.wrappers import BaseResponse, Request
 from dropafile import (
     DropAFileApplication, execute_cmd, create_ssl_cert, get_random_password,
     ALLOWED_PWD_CHARS, handle_options
     )
 
 
-def get_basic_auth_headers(name='somename', password=''):
+def encode_creds(username='somename', password=''):
+    # turn credentials given into base64 encoded string
+    auth_string = '%s:%s' % (username, password)
+    encoded = base64.b64encode(auth_string.encode('utf-8'))
+    return 'Basic %s' % encoded.decode('utf-8')
+
+
+def get_basic_auth_headers(username='somename', password=''):
+    # get a set of request headers with authorization set to creds.
     headers = Headers()
-    auth_string = '%s:%s' % (name, password)
-    enc_auth_string = base64.b64encode(auth_string.encode('utf-8'))
-    headers.add('Authorization', 'Basic %s' % enc_auth_string.decode('utf-8'))
+    headers.add(
+        'Authorization', encode_creds(username=username, password=password))
     return headers
 
 
@@ -28,7 +35,7 @@ def test_page_response():
     application = DropAFileApplication()
     client = Client(application, BaseResponse)
     headers = get_basic_auth_headers(
-        name='somename', password=application.password)
+        username='somename', password=application.password)
     resp = client.get('/', headers=headers)
     assert resp.status == '200 OK'
     mimetype = resp.headers.get('Content-Type')
@@ -40,7 +47,7 @@ def test_get_js():
     application = DropAFileApplication()
     client = Client(application, BaseResponse)
     headers = get_basic_auth_headers(
-        name='somename', password=application.password)
+        username='somename', password=application.password)
     resp = client.get('dropzone.js', headers=headers)
     assert resp.status == '200 OK'
     mimetype = resp.headers.get('Content-Type')
@@ -52,7 +59,7 @@ def test_get_css():
     application = DropAFileApplication()
     client = Client(application, BaseResponse)
     headers = get_basic_auth_headers(
-        name='somename', password=application.password)
+        username='somename', password=application.password)
     resp = client.get('dropzone.css', headers=headers)
     assert resp.status == '200 OK'
     mimetype = resp.headers.get('Content-Type')
@@ -64,7 +71,7 @@ def test_send_file():
     application = DropAFileApplication()
     client = Client(application, BaseResponse)
     headers = get_basic_auth_headers(
-        name='somename', password=application.password)
+        username='somename', password=application.password)
     resp = client.post(
         '/index.html',
         headers=headers,
@@ -144,6 +151,34 @@ def test_basic_auth_req_by_default():
     resp = client.get('/')
     header = resp.headers.get('WWW-Authenticate', None)
     assert header is not None
+
+def test_check_auth_requires_auth():
+    # we require at least some creds to authenticate
+    app = DropAFileApplication()
+    app.password = 'sosecret'
+    env = create_environ()
+    request = Request(env)
+    assert app.check_auth(request) is False
+
+def test_check_auth_wrong_passwd():
+    # of course check_auth requires the correct password
+    app = DropAFileApplication()
+    app.password = 'sosecret'
+    env = create_environ()
+    env.update(HTTP_AUTHORIZATION=encode_creds(
+        username='somename', password='wrong-password'))
+    request = Request(env)
+    assert app.check_auth(request) is False
+
+def test_check_auth_correct_passwd():
+    # the correct password can be seen.
+    app = DropAFileApplication()
+    app.password = 'sosecret'
+    env = create_environ()
+    env.update(HTTP_AUTHORIZATION=encode_creds(
+        username='somename', password='sosecret'))
+    request = Request(env)
+    assert app.check_auth(request) is True
 
 
 class TestArgParser(object):
