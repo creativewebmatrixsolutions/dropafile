@@ -152,6 +152,7 @@ def test_basic_auth_req_by_default():
     header = resp.headers.get('WWW-Authenticate', None)
     assert header is not None
 
+
 def test_check_auth_requires_auth():
     # we require at least some creds to authenticate
     app = DropAFileApplication()
@@ -159,6 +160,7 @@ def test_check_auth_requires_auth():
     env = create_environ()
     request = Request(env)
     assert app.check_auth(request) is False
+
 
 def test_check_auth_wrong_passwd():
     # of course check_auth requires the correct password
@@ -169,6 +171,7 @@ def test_check_auth_wrong_passwd():
         username='somename', password='wrong-password'))
     request = Request(env)
     assert app.check_auth(request) is False
+
 
 def test_check_auth_correct_passwd():
     # the correct password can be seen.
