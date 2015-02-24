@@ -162,6 +162,7 @@ def run_server(args=None):
         ssl_context.load_cert_chain(cert, key)
     application = DropAFileApplication()
     print("Password is: %s" % application.password)
+    sys.stdout.flush()
     run_simple('localhost', 8443, application, ssl_context=ssl_context)
     if temp_cert:
         shutil.rmtree(os.path.dirname(cert))
