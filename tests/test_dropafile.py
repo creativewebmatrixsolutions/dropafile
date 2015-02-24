@@ -5,6 +5,9 @@ import os
 import pytest
 import re
 import shutil
+import subprocess
+import time
+from contextlib import contextmanager
 from io import BytesIO
 from werkzeug.datastructures import Headers
 from werkzeug.test import Client, create_environ
@@ -13,6 +16,22 @@ from dropafile import (
     DropAFileApplication, execute_cmd, create_ssl_cert, get_random_password,
     ALLOWED_PWD_CHARS, handle_options
     )
+
+
+@contextmanager
+def popen(*args, **kw):
+    # a Python 2.6/2.7 compatible Popen contextmanager
+    p = subprocess.Popen(*args, **kw)
+    try:
+        yield p
+    finally:
+        if p.stdout:
+            p.stdout.close()
+        if p.stderr:
+            p.stderr.close()
+        if p.stdin:
+            p.stdin.close()
+        p.wait()
 
 
 def encode_creds(username='somename', password=''):
@@ -182,6 +201,27 @@ def test_check_auth_correct_passwd():
         username='somename', password='sosecret'))
     request = Request(env)
     assert app.check_auth(request) is True
+
+
+def test_main(capfd):
+    # we can run the main programme
+    out, err = '', ''
+    with popen(['dropafile'], bufsize=1) as p:
+        timestamp = time.time()
+        while True:
+            newout, newerr = capfd.readouterr()
+            out += newout
+            err += newerr
+            if p.poll() is not None:
+                break
+            if err and ('Running' in err):
+                break
+            if time.time() - timestamp >= 5.0:
+                # Timeout happened
+                break
+            time.sleep(0.1)
+        p.terminate()
+    assert (out, err) == 'qwe'
 
 
 class TestArgParser(object):
