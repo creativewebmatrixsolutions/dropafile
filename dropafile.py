@@ -154,10 +154,12 @@ def run_server(args=None):
     print("Done.")
     print("Certificate in: %s" % cert)
     print("Key in:         %s" % key)
-    ssl_context = ssl.SSLContext(ssl.PROTOCOL_SSLv23)
-    ssl_context.options |= ssl.OP_NO_SSLv2  # considered unsafe
-    ssl_context.options |= ssl.OP_NO_SSLv3  # considered unsafe
-    ssl_context.load_cert_chain(cert, key)
+    ssl_context = (cert, key)
+    if hasattr(ssl, 'SSLContext'):  # py >= 2.7.9
+        ssl_context = ssl.SSLContext(ssl.PROTOCOL_SSLv23)
+        ssl_context.options |= ssl.OP_NO_SSLv2  # considered unsafe
+        ssl_context.options |= ssl.OP_NO_SSLv3  # considered unsafe
+        ssl_context.load_cert_chain(cert, key)
     application = DropAFileApplication()
     print("Password is: %s" % application.password)
     run_simple('localhost', 8443, application, ssl_context=ssl_context)
