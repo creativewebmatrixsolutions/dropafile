@@ -221,7 +221,8 @@ def test_main(capfd):
                 break
             time.sleep(0.1)
         p.terminate()
-    assert (out, err) == 'qwe'
+    assert 'Certificate in:' in out
+    assert 'Running' in err
 
 
 class TestArgParser(object):
