@@ -18,6 +18,11 @@ from dropafile import (
     )
 
 
+#: find a certificate path in output.
+RE_CERTPATH = re.compile(
+    '^.*Certificate in:[\s]+([^\s][^\n]+)\n.*$', re.M + re.S)
+
+
 @contextmanager
 def popen(*args, **kw):
     # a Python 2.6/2.7 compatible Popen contextmanager
@@ -47,6 +52,20 @@ def get_basic_auth_headers(username='somename', password=''):
     headers.add(
         'Authorization', encode_creds(username=username, password=password))
     return headers
+
+
+def clean_up_cert_dir(output):
+    # remove certdir, if in tmp
+    match = RE_CERTPATH.match(output)
+    if not match:
+        return
+    cert_path = match.groups()[0]
+    if not os.path.exists(cert_path):
+        return
+    dir_path = os.path.dirname(cert_path)
+    if dir_path == os.getcwd():
+        return
+    shutil.rmtree(dir_path)
 
 
 def test_page_response():
@@ -204,7 +223,7 @@ def test_check_auth_correct_passwd():
     assert app.check_auth(request) is True
 
 
-def NOtest_main(capfd):
+def test_main(capfd):
     # we can run the main programme
     out, err = '', ''
     with popen(['dropafile'], bufsize=1) as p:
@@ -224,6 +243,7 @@ def NOtest_main(capfd):
         p.terminate()
     assert 'Certificate in:' in out
     assert 'Running' in err
+    clean_up_cert_dir(out)
 
 
 class TestArgParser(object):
