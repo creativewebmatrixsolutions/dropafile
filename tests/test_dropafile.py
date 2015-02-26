@@ -1,6 +1,7 @@
 # tests for dropafile module.
 import base64
 import math
+import multiprocessing
 import os
 import pytest
 import re
@@ -14,7 +15,7 @@ from werkzeug.test import Client, create_environ
 from werkzeug.wrappers import BaseResponse, Request
 from dropafile import (
     DropAFileApplication, execute_cmd, create_ssl_cert, get_random_password,
-    ALLOWED_PWD_CHARS, handle_options
+    ALLOWED_PWD_CHARS, handle_options, run_server
     )
 
 
@@ -223,24 +224,26 @@ def test_check_auth_correct_passwd():
     assert app.check_auth(request) is True
 
 
-def test_main(capfd):
-    # we can run the main programme
-    out, err = '', ''
-    with popen(['dropafile'], bufsize=1) as p:
-        timestamp = time.time()
-        while True:
-            newout, newerr = capfd.readouterr()
-            out += newout
-            err += newerr
-            if p.poll() is not None:
-                break
-            if err and ('Running' in err):
-                break
-            if time.time() - timestamp >= 5.0:
-                # Timeout happened
-                break
-            time.sleep(0.1)
-        p.terminate()
+def test_run_server(capfd):
+    # we can start a server
+    p1 = multiprocessing.Process(target=run_server)
+    p1.start()
+    timeout = 0.1
+    out, err = ('', '')
+    while timeout <= 103.0:  # abort after about 10 rounds
+        p1.join(timeout)
+        timeout *= 2
+        new_out, new_err = capfd.readouterr()
+        out += new_out
+        err += new_err
+        if 'Running' in err:
+            break
+    if p1.is_alive():
+        p1.terminate()
+        p1.join()
+    new_out, new_err = capfd.readouterr()
+    out += new_out
+    err += new_err
     assert 'Certificate in:' in out
     assert 'Running' in err
     clean_up_cert_dir(out)
