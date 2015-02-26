@@ -224,6 +224,17 @@ def test_check_auth_correct_passwd():
     assert app.check_auth(request) is True
 
 
+def outerr_append(out, err, src):
+    # append contents read by capsys.readouterr/capfd.readouterr to
+    # out, err
+    new_out, new_err = src.readouterr()
+    if new_out:
+        out += new_out
+    if new_err:
+        err += new_err
+    return out, err
+
+
 def test_run_server(capfd):
     # we can start a server
     p1 = multiprocessing.Process(target=run_server)
@@ -233,17 +244,13 @@ def test_run_server(capfd):
     while timeout <= 103.0:  # abort after about 10 rounds
         p1.join(timeout)
         timeout *= 2
-        new_out, new_err = capfd.readouterr()
-        out += new_out
-        err += new_err
+        out, err = outerr_append(out, err, capfd)
         if 'Running' in err:
             break
     if p1.is_alive():
         p1.terminate()
         p1.join()
-    new_out, new_err = capfd.readouterr()
-    out += new_out
-    err += new_err
+    out, err = outerr_append(out, err, capfd)
     assert 'Certificate in:' in out
     assert 'Running' in err
     clean_up_cert_dir(out)
