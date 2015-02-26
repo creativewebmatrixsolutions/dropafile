@@ -149,11 +149,13 @@ def run_server(args=None):
     if args is None:
         args = sys.argv
     print("Creating temporary self-signed SSL certificate...")
+    sys.stdout.flush()
     cert, key = create_ssl_cert()
     temp_cert = True
     print("Done.")
     print("Certificate in: %s" % cert)
     print("Key in:         %s" % key)
+    sys.stdout.flush()
     ssl_context = (cert, key)
     if hasattr(ssl, 'SSLContext'):  # py >= 2.7.9
         ssl_context = ssl.SSLContext(ssl.PROTOCOL_SSLv23)
