@@ -235,9 +235,25 @@ def outerr_append(out, err, src):
     return out, err
 
 
-def test_run_server(capfd):
-    # we can start a server
-    p1 = multiprocessing.Process(target=run_server)
+class AbortCondition(object):
+
+    def __init__(self, text='Running'):
+        self.text = text
+
+    def check_err(self, out, err):
+        return self.text in err
+
+
+default_abort = AbortCondition().check_err
+
+
+def run_in_subprocess(capfd, abort_when, target, *args, **kw):
+    # start target with parameters `args` and keywords `kw`.
+    # Capture output with capfd and abort started process when `abort_when`
+    # evaluates to ``True``.
+    # `abort_when` must be a function accepting stdout and stderr output.
+    # If it returns ``True`` the target is terminated and output returned.
+    p1 = multiprocessing.Process(target=target, args=args, kwargs=kw)
     p1.start()
     timeout = 0.1
     out, err = ('', '')
@@ -245,12 +261,18 @@ def test_run_server(capfd):
         p1.join(timeout)
         timeout *= 2
         out, err = outerr_append(out, err, capfd)
-        if 'Running' in err:
+        if abort_when(out, err):
             break
     if p1.is_alive():
         p1.terminate()
         p1.join()
     out, err = outerr_append(out, err, capfd)
+    return out, err
+
+
+def test_run_server(capfd):
+    # we can start a server
+    out, err = run_in_subprocess(capfd, default_abort, run_server)
     assert 'Certificate in:' in out
     assert 'Running' in err
     clean_up_cert_dir(out)
