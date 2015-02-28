@@ -8,7 +8,6 @@ import re
 import shutil
 import signal
 import subprocess
-import time
 from contextlib import contextmanager
 from io import BytesIO
 from werkzeug.datastructures import Headers
