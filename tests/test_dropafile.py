@@ -6,6 +6,7 @@ import os
 import pytest
 import re
 import shutil
+import signal
 import subprocess
 import time
 from contextlib import contextmanager
@@ -264,7 +265,9 @@ def run_in_subprocess(capfd, abort_when, target, *args, **kw):
         if abort_when(out, err):
             break
     if p1.is_alive():
-        p1.terminate()
+        # do not use p1.terminate() here, as only with SIGINT we get
+        # coverage data from subprocess.
+        os.kill(p1.pid, signal.SIGINT)
         p1.join()
     out, err = outerr_append(out, err, capfd)
     return out, err
