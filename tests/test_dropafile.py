@@ -265,7 +265,7 @@ def run_in_subprocess(capfd, abort_when, target, *args, **kw):
             break
     if p1.is_alive():
         # do not use p1.terminate() here, as only with SIGINT we get
-        # coverage data from subprocess.
+        # coverage data from subprocess (terminate() sends SIGTERM).
         os.kill(p1.pid, signal.SIGINT)
         p1.join()
     out, err = outerr_append(out, err, capfd)
