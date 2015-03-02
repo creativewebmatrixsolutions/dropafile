@@ -25,19 +25,23 @@ def outerr_append(out, err, src):
 
 
 class SubprocessRunner(object):
+    """Runs a passed in Python function (with args, kws).
 
+    Desigend for use with server processes that must be aborted. After
+    `run()` was called, we execute the passed in command, wait until
+    we meet the abort condition evaluated by `abort_when(out, err)`
+    and return the output.
+
+    `abort_when` looks by default for string `Running` in stderr.
+    """
+
+    #: The condition to meet to abort a started server process
     abort_when = AbortCondition().check_err
 
     def __init__(self, capfd):
         self.capfd = capfd
 
     def run(self, target, *args, **kw):
-        # start target with parameters `args` and keywords `kw`.
-        # Capture output with capfd and abort started process when
-        # `abort_when` evaluates to ``True``.
-        # `abort_when` must be a function accepting stdout and stderr
-        # output.  If it returns ``True`` the target is terminated and
-        # output returned.
         p1 = multiprocessing.Process(target=target, args=args, kwargs=kw)
         p1.start()
         timeout = 0.1
