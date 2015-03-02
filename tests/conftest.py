@@ -28,8 +28,10 @@ class SubprocessRunner(object):
 
     abort_when = AbortCondition().check_err
 
-    def run(self, capfd, target, *args, **kw):
+    def __init__(self, capfd):
+        self.capfd = capfd
 
+    def run(self, target, *args, **kw):
         # start target with parameters `args` and keywords `kw`.
         # Capture output with capfd and abort started process when
         # `abort_when` evaluates to ``True``.
@@ -43,7 +45,7 @@ class SubprocessRunner(object):
         while timeout <= 103.0:  # abort after about 10 rounds
             p1.join(timeout)
             timeout *= 2
-            out, err = outerr_append(out, err, capfd)
+            out, err = outerr_append(out, err, self.capfd)
             if self.abort_when(out, err):
                 break
         if p1.is_alive():
@@ -51,11 +53,11 @@ class SubprocessRunner(object):
             # coverage data from subprocess (terminate() sends SIGTERM).
             os.kill(p1.pid, signal.SIGINT)
             p1.join()
-        out, err = outerr_append(out, err, capfd)
+        out, err = outerr_append(out, err, self.capfd)
         return out, err
 
 
 @pytest.fixture(scope="function")
-def proc_runner(request):
-    runner = SubprocessRunner()
+def proc_runner(request, capfd):
+    runner = SubprocessRunner(capfd)
     return runner

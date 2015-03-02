@@ -224,7 +224,7 @@ def test_check_auth_correct_passwd():
 
 def test_run_server(capfd, proc_runner):
     # we can start a server
-    out, err = proc_runner.run(capfd, run_server)
+    out, err = proc_runner.run(run_server)
     assert 'Certificate in:' in out
     assert 'Running' in err
     clean_up_cert_dir(out)
