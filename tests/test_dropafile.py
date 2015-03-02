@@ -1,12 +1,10 @@
 # tests for dropafile module.
 import base64
 import math
-import multiprocessing
 import os
 import pytest
 import re
 import shutil
-import signal
 import subprocess
 from contextlib import contextmanager
 from io import BytesIO
