@@ -224,57 +224,9 @@ def test_check_auth_correct_passwd():
     assert app.check_auth(request) is True
 
 
-def outerr_append(out, err, src):
-    # append contents read by capsys.readouterr/capfd.readouterr to
-    # out, err
-    new_out, new_err = src.readouterr()
-    if new_out:
-        out += new_out
-    if new_err:
-        err += new_err
-    return out, err
-
-
-class AbortCondition(object):
-
-    def __init__(self, text='Running'):
-        self.text = text
-
-    def check_err(self, out, err):
-        return self.text in err
-
-
-default_abort = AbortCondition().check_err
-
-
-def run_in_subprocess(capfd, abort_when, target, *args, **kw):
-    # start target with parameters `args` and keywords `kw`.
-    # Capture output with capfd and abort started process when `abort_when`
-    # evaluates to ``True``.
-    # `abort_when` must be a function accepting stdout and stderr output.
-    # If it returns ``True`` the target is terminated and output returned.
-    p1 = multiprocessing.Process(target=target, args=args, kwargs=kw)
-    p1.start()
-    timeout = 0.1
-    out, err = ('', '')
-    while timeout <= 103.0:  # abort after about 10 rounds
-        p1.join(timeout)
-        timeout *= 2
-        out, err = outerr_append(out, err, capfd)
-        if abort_when(out, err):
-            break
-    if p1.is_alive():
-        # do not use p1.terminate() here, as only with SIGINT we get
-        # coverage data from subprocess (terminate() sends SIGTERM).
-        os.kill(p1.pid, signal.SIGINT)
-        p1.join()
-    out, err = outerr_append(out, err, capfd)
-    return out, err
-
-
-def test_run_server(capfd):
+def test_run_server(capfd, proc_runner):
     # we can start a server
-    out, err = run_in_subprocess(capfd, default_abort, run_server)
+    out, err = proc_runner.run(capfd, run_server)
     assert 'Certificate in:' in out
     assert 'Running' in err
     clean_up_cert_dir(out)
