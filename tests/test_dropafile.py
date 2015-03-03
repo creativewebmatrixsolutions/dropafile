@@ -117,6 +117,8 @@ def test_send_file():
             },
         )
     assert resp.status == '200 OK'
+    uploaded_path = os.path.join(application.upload_dir, 'sample.txt')
+    assert os.path.isfile(uploaded_path)
 
 
 @pytest.mark.skipif(
