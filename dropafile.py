@@ -23,6 +23,7 @@ import ssl
 import subprocess
 import sys
 import tempfile
+from werkzeug import secure_filename
 from werkzeug.serving import run_simple
 from werkzeug.wrappers import Request, Response
 
@@ -61,7 +62,7 @@ def get_random_password():
 
 class DropAFileApplication(object):
 
-    def __init__(self, password=None):
+    def __init__(self, password=None, upload_dir=None):
         """Drop-A-File application.
 
         `password` is required to access the application's service. If
@@ -70,6 +71,9 @@ class DropAFileApplication(object):
         if password is None:
             password = get_random_password()
         self.password = password
+        if upload_dir is None:
+            upload_dir = tempfile.mkdtemp()
+        self.upload_dir = upload_dir
 
     def check_auth(self, request):
         """Check basic auth against local password.
@@ -95,10 +99,24 @@ class DropAFileApplication(object):
                   'Content-Type': 'text/html'}
             )
 
+    def handle_uploaded_files(self, request):
+        """Look for a upload file in `request`.
+
+        If one is found, it is saved to `self.upload_dir`.
+        """
+        uploaded_file = request.files.get('file', None)
+        if uploaded_file is None:
+            return
+        filename = secure_filename(uploaded_file.filename)
+        path = os.path.join(self.upload_dir, filename)
+        print("RECEIVED: %s" % path)
+        uploaded_file.save(path)
+
     @Request.application
     def __call__(self, request):
         if not self.check_auth(request):
             return self.authenticate()
+        self.handle_uploaded_files(request)
         path = request.path
         if path not in PATH_MAP.keys():
             path = '/index.html'
