@@ -1,7 +1,9 @@
 import multiprocessing
 import os
 import pytest
+import shutil
 import signal
+import tempfile
 
 
 class AbortCondition(object):
@@ -65,3 +67,23 @@ class SubprocessRunner(object):
 def proc_runner(request, capfd):
     runner = SubprocessRunner(capfd)
     return runner
+
+
+@pytest.fixture(scope="session", autouse=True)
+def temporary_tempdir_env(request):
+    """Set a new root for temporary files.
+
+    All temporary files created in a test session by `tempfile` module
+    functions, are created in a folder created here.
+
+    This folder is removed after test session.
+    """
+    old_tempdir = tempfile.gettempdir()
+    new_tempdir = tempfile.mkdtemp()
+    tempfile.tempdir = new_tempdir
+
+    def restore_old_tempdir():
+        tempfile.tempdir = old_tempdir
+        shutil.rmtree(new_tempdir)
+
+    request.addfinalizer(restore_old_tempdir)
