@@ -53,20 +53,6 @@ def get_basic_auth_headers(username='somename', password=''):
     return headers
 
 
-def clean_up_cert_dir(output):
-    # remove certdir, if in tmp
-    match = RE_CERTPATH.match(output)
-    if not match:
-        return
-    cert_path = match.groups()[0]
-    if not os.path.exists(cert_path):
-        return
-    dir_path = os.path.dirname(cert_path)
-    if dir_path == os.getcwd():
-        return
-    shutil.rmtree(dir_path)
-
-
 def test_page_response():
     # we can get some HTML page for any path
     application = DropAFileApplication()
@@ -231,7 +217,6 @@ class Test_run_server(object):
         out, err = proc_runner.run(run_server, args=["dropafile", ])
         assert 'Certificate in:' in out
         assert 'Running' in err
-        clean_up_cert_dir(out)
 
     def test_help(self, proc_runner):
         # we can get help from run_server()
