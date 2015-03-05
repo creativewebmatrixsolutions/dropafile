@@ -224,12 +224,14 @@ def test_check_auth_correct_passwd():
     assert app.check_auth(request) is True
 
 
-def test_run_server(capfd, proc_runner):
-    # we can start a server
-    out, err = proc_runner.run(run_server)
-    assert 'Certificate in:' in out
-    assert 'Running' in err
-    clean_up_cert_dir(out)
+class run_server_tests(object):
+
+    def test_run_server(capfd, proc_runner):
+        # we can start a server (no options given)
+        out, err = proc_runner.run(run_server)
+        assert 'Certificate in:' in out
+        assert 'Running' in err
+        clean_up_cert_dir(out)
 
 
 class TestArgParser(object):
