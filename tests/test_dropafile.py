@@ -226,7 +226,7 @@ def test_check_auth_correct_passwd():
 
 class Test_run_server(object):
 
-    def test_run_server(self, capfd, proc_runner):
+    def test_no_options(self, capfd, proc_runner):
         # we can start a server (no options given)
         out, err = proc_runner.run(run_server)
         assert 'Certificate in:' in out
