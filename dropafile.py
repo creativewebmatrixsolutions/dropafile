@@ -166,6 +166,7 @@ def create_ssl_cert(path=None, bits=4096, days=2, cn='localhost',
 def run_server(args=None):
     if args is None:
         args = sys.argv
+    options = handle_options(args[1:])
     print("Creating temporary self-signed SSL certificate...")
     sys.stdout.flush()
     cert, key = create_ssl_cert()

@@ -233,6 +233,11 @@ class Test_run_server(object):
         assert 'Running' in err
         clean_up_cert_dir(out)
 
+    def test_help(self, proc_runner):
+        # we can get help from run_server()
+        out, err = proc_runner.run(run_server, args=["dropafile", "--help"])
+        assert 'show this help message and exit' in out
+
 
 class TestArgParser(object):
 
