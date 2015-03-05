@@ -40,6 +40,9 @@ class SubprocessRunner(object):
     #: The condition to meet to abort a started server process
     abort_when = AbortCondition().check_err
 
+    #: The exit code of the last run started (and stopped) process
+    exit_code = None
+
     def __init__(self, capfd):
         self.capfd = capfd
 
@@ -59,6 +62,7 @@ class SubprocessRunner(object):
             # coverage data from subprocess (terminate() sends SIGTERM).
             os.kill(p1.pid, signal.SIGINT)
             p1.join()
+        self.exitcode = p1.exitcode
         out, err = outerr_append(out, err, self.capfd)
         return out, err
 
