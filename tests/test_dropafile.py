@@ -237,6 +237,7 @@ class Test_run_server(object):
         # we can get help from run_server()
         out, err = proc_runner.run(run_server, args=["dropafile", "--help"])
         assert 'show this help message and exit' in out
+        assert proc_runner.exitcode == 0
 
 
 class TestArgParser(object):
@@ -248,7 +249,7 @@ class TestArgParser(object):
         out, err = capsys.readouterr()
         assert exc_info.value.code == 0
 
-    def notest_defaults(self):
+    def test_defaults(self):
         # we can get options with defaults set
         result = handle_options([])
         assert result is not None
