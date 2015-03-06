@@ -234,7 +234,19 @@ class TestArgParser(object):
         out, err = capsys.readouterr()
         assert exc_info.value.code == 0
 
+    def test_help_lists_all_options(self, capsys):
+        # all options are listed in --help
+        with pytest.raises(SystemExit) as exc_info:
+            handle_options(['foo', '--help'])
+        out, err = capsys.readouterr()
+        assert '--host' in out
+
     def test_defaults(self):
         # we can get options with defaults set
         result = handle_options([])
         assert result is not None
+        assert result.host == 'localhost'
+
+    def test_host(self):
+        result = handle_options(['--host', 'foo'])
+        assert result.host == 'foo'

@@ -44,6 +44,13 @@ def handle_options(args):
     """Handle commandline options.
     """
     parser = argparse.ArgumentParser(description="Start dropafile app.")
+    parser.add_argument(
+        '--host', required=False, default='localhost',
+        help=(
+            'Host we bind to. An IP address or DNS name. `localhost`'
+            ' by default.'
+            ),
+        )
     opts = parser.parse_args(args)
     return opts
 
