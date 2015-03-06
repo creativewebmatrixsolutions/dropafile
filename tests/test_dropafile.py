@@ -236,7 +236,7 @@ class TestArgParser(object):
 
     def test_help_lists_all_options(self, capsys):
         # all options are listed in --help
-        with pytest.raises(SystemExit) as exc_info:
+        with pytest.raises(SystemExit):
             handle_options(['foo', '--help'])
         out, err = capsys.readouterr()
         assert '--host' in out
