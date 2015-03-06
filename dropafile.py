@@ -202,4 +202,4 @@ def run_server(args=None):
     application = DropAFileApplication()
     print("Password is: %s" % application.password)
     sys.stdout.flush()
-    run_simple('localhost', 8443, application, ssl_context=ssl_context)
+    run_simple(options.host, 8443, application, ssl_context=ssl_context)
