@@ -147,6 +147,7 @@ def create_ssl_cert(path=None, bits=4096, days=2, cn='localhost',
                     country='US', state='', location=''):
     """Create an SSL cert and key in directory `path`.
     """
+    print("Creating temporary self-signed SSL certificate...")
     if path is None:
         path = tempfile.mkdtemp()
     cert_path = os.path.join(path, 'cert.pem')
@@ -160,30 +161,39 @@ def create_ssl_cert(path=None, bits=4096, days=2, cn='localhost',
         '-sha256', '-config', openssl_conf, '-batch', "-subj", subject
         ]
     out, err = execute_cmd(cmd)
+    print("Done.")
+    print("Certificate in: %s" % cert_path)
+    print("Key in:         %s" % key_path)
     return cert_path, key_path
+
+
+def get_ssl_context(cert_path=None, key_path=None):
+    """Get an SSL context to serve HTTP.
+
+    If `cert_path` or `key_path` are ``None``, we create some. Then we
+    add some modifiers (avail. with Python >= 2.7.9) to disable unsafe
+    ciphers etc.
+
+    The returned SSL context can be used with Werkzeug `run_simple`.
+    """
+    if (key_path is None) or (cert_path is None):
+        cert_path, key_path = create_ssl_cert()
+    ssl_context = (cert_path, key_path)
+    if hasattr(ssl, 'SSLContext'):  # py >= 2.7.9
+        ssl_context = ssl.SSLContext(ssl.PROTOCOL_SSLv23)
+        ssl_context.options |= ssl.OP_NO_SSLv2  # considered unsafe
+        ssl_context.options |= ssl.OP_NO_SSLv3  # considered unsafe
+        ssl_context.load_cert_chain(cert_path, key_path)
+    return ssl_context
 
 
 def run_server(args=None):
     if args is None:
         args = sys.argv
     options = handle_options(args[1:])
-    print("Creating temporary self-signed SSL certificate...")
+    ssl_context = get_ssl_context()
     sys.stdout.flush()
-    cert, key = create_ssl_cert()
-    temp_cert = True
-    print("Done.")
-    print("Certificate in: %s" % cert)
-    print("Key in:         %s" % key)
-    sys.stdout.flush()
-    ssl_context = (cert, key)
-    if hasattr(ssl, 'SSLContext'):  # py >= 2.7.9
-        ssl_context = ssl.SSLContext(ssl.PROTOCOL_SSLv23)
-        ssl_context.options |= ssl.OP_NO_SSLv2  # considered unsafe
-        ssl_context.options |= ssl.OP_NO_SSLv3  # considered unsafe
-        ssl_context.load_cert_chain(cert, key)
     application = DropAFileApplication()
     print("Password is: %s" % application.password)
     sys.stdout.flush()
     run_simple('localhost', 8443, application, ssl_context=ssl_context)
-    if temp_cert:
-        shutil.rmtree(os.path.dirname(cert))
