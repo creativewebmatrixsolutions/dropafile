@@ -18,7 +18,6 @@
 import argparse
 import os
 import random
-import shutil
 import ssl
 import subprocess
 import sys
