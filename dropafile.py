@@ -51,6 +51,12 @@ def handle_options(args):
             ' by default.'
             ),
         )
+    parser.add_argument(
+        '-p', '--port', required=False, default=8443, type=int,
+        help=(
+            'Port we listen at. An integer. 8443 by default.'
+            )
+        )
     opts = parser.parse_args(args)
     return opts
 
@@ -202,4 +208,5 @@ def run_server(args=None):
     application = DropAFileApplication()
     print("Password is: %s" % application.password)
     sys.stdout.flush()
-    run_simple(options.host, 8443, application, ssl_context=ssl_context)
+    run_simple(options.host, options.port, application,
+               ssl_context=ssl_context)

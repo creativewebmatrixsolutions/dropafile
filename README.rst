@@ -37,6 +37,19 @@ unsecure manner. For instance as a quickly installable workaround if
 people are not able or willing to use GnuPG or similar, although they
 have sensible documents to send.
 
+The `--help` option will display all available options::
+
+  $ dropfile --help
+  usage: dropafile [-h] [--host HOST] [-p PORT]
+
+  Start dropafile app.
+
+  optional arguments:
+    -h, --help            show this help message and exit
+    --host HOST           Host we bind to. An IP address or DNS name.
+                          `localhost` by default.
+    -p PORT, --port PORT  Port we listen at. An integer. 8443 by default.
+
 
 Developer Install
 -----------------

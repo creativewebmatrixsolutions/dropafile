@@ -240,13 +240,19 @@ class TestArgParser(object):
             handle_options(['foo', '--help'])
         out, err = capsys.readouterr()
         assert '--host' in out
+        assert '--port' in out
 
     def test_defaults(self):
         # we can get options with defaults set
         result = handle_options([])
         assert result is not None
         assert result.host == 'localhost'
+        assert result.port == 8443
 
     def test_host(self):
         result = handle_options(['--host', 'foo'])
         assert result.host == 'foo'
+
+    def test_port(self):
+        result = handle_options(['--port', '1234'])
+        assert result.port == 1234
