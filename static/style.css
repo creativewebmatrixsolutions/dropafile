@@ -1,0 +1,14 @@
+.dropzone {
+    background-color: #ddd;
+    border-style: dotted;
+    border-width: 2px;
+    margin: 10px;
+    border-color: #800;
+    border-radius: 20px;
+    -moz-border-radius: 20px;
+    -webkit-border-radius: 20px;
+}
+.dropzone:hover {
+    background-color: #dde;
+    border-color: #f88;
+}

@@ -30,6 +30,7 @@ from werkzeug.wrappers import Request, Response
 PATH_MAP = {
     '/dropzone.js': ('dropzone.js', 'text/javascript'),
     '/dropzone.css': ('dropzone.css', 'text/css'),
+    '/style.css': ('style.css', 'text/css'),
     '/index.html': ('page.html', 'text/html'),
     }
 
