@@ -215,7 +215,7 @@ def run_server(args=None):
     options = handle_options(args[1:])
     ssl_context = get_ssl_context()
     sys.stdout.flush()
-    application = DropAFileApplication()
+    application = DropAFileApplication(password=options.secret)
     print("Password is: %s" % application.password)
     sys.stdout.flush()
     run_simple(options.host, options.port, application,
