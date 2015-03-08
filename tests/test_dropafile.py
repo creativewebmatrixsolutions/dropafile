@@ -29,12 +29,9 @@ def popen(*args, **kw):
     try:
         yield p
     finally:
-        if p.stdout:
-            p.stdout.close()
-        if p.stderr:
-            p.stderr.close()
-        if p.stdin:
-            p.stdin.close()
+        for stream in (p.stdout, p.stderr, p.stdin):
+            if stream:
+                stream.close()
         p.wait()
 
 
