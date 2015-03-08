@@ -49,6 +49,9 @@ The `--help` option will display all available options::
     --host HOST           Host we bind to. An IP address or DNS name.
                           `localhost` by default.
     -p PORT, --port PORT  Port we listen at. An integer. 8443 by default.
+    -s PASSWORD, --secret PASSWORD
+                          Password to access dropafile. If none is given we
+                          generate one.
 
 
 Developer Install
