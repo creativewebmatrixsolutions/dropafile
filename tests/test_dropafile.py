@@ -176,7 +176,8 @@ class Test_run_server(object):
 
     def test_no_options(self, proc_runner):
         # we can start a server (no options given)
-        out, err = proc_runner.run(run_server, args=["dropafile", ])
+        proc_runner.argv = ['dropafile', ]
+        out, err = proc_runner.run(run_server, args=None)
         assert 'Certificate in:' in out
         assert 'Running' in err
 
