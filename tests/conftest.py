@@ -3,6 +3,7 @@ import os
 import pytest
 import shutil
 import signal
+import sys
 import tempfile
 
 
@@ -43,10 +44,15 @@ class SubprocessRunner(object):
     #: The exit code of the last run started (and stopped) process
     exit_code = None
 
+    #: The sys.argv set during run()
+    argv = sys.argv
+
     def __init__(self, capfd):
         self.capfd = capfd
 
     def run(self, target, *args, **kw):
+        old_argv = sys.argv
+        sys.argv = self.argv
         p1 = multiprocessing.Process(target=target, args=args, kwargs=kw)
         p1.start()
         timeout = 0.1
@@ -64,11 +70,14 @@ class SubprocessRunner(object):
             p1.join()
         self.exitcode = p1.exitcode
         out, err = outerr_append(out, err, self.capfd)
+        sys.argv = old_argv
         return out, err
 
 
 @pytest.fixture(scope="function")
 def proc_runner(request, capfd):
+    """Returns a SubprocessRunner capturing output via `capfd`.
+    """
     runner = SubprocessRunner(capfd)
     return runner
 
