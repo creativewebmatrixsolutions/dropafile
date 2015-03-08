@@ -58,6 +58,13 @@ def handle_options(args):
             'Port we listen at. An integer. 8443 by default.'
             )
         )
+    parser.add_argument(
+        '-s', '--secret', required=False, metavar='PASSWORD',
+        help=(
+            'Password to access dropafile. If none is given we generate '
+            'one.'
+            )
+        )
     opts = parser.parse_args(args)
     return opts
 
