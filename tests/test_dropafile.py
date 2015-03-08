@@ -186,6 +186,12 @@ class Test_run_server(object):
         assert 'show this help message and exit' in out
         assert proc_runner.exitcode == 0
 
+    def test_secret(self, proc_runner):
+        # a passed-in password is respected
+        out, err = proc_runner.run(
+            run_server, args=["dropafile", "-s", "sosecret"])
+        assert 'Password is: sosecret' in out
+
 
 class TestFunctional(object):
     # Functional browser tests
@@ -254,3 +260,12 @@ class TestFunctional(object):
         resp = client.get('/')
         header = resp.headers.get('WWW-Authenticate', None)
         assert header is not None
+
+    def test_page_set_password(self):
+        # we can get some HTML page for any path
+        application = DropAFileApplication(password="sosecret")
+        client = Client(application, BaseResponse)
+        headers = get_basic_auth_headers(
+            username='somename', password="sosecret")
+        resp = client.get('/', headers=headers)
+        assert resp.status == '200 OK'
