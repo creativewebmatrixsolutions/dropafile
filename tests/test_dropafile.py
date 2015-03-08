@@ -133,21 +133,6 @@ class TestApp(object):
         assert app.check_auth(request) is True
 
 
-class Test_run_server(object):
-
-    def test_no_options(self, proc_runner):
-        # we can start a server (no options given)
-        out, err = proc_runner.run(run_server, args=["dropafile", ])
-        assert 'Certificate in:' in out
-        assert 'Running' in err
-
-    def test_help(self, proc_runner):
-        # we can get help from run_server()
-        out, err = proc_runner.run(run_server, args=["dropafile", "--help"])
-        assert 'show this help message and exit' in out
-        assert proc_runner.exitcode == 0
-
-
 class TestArgParser(object):
 
     def test_help(self, capsys):
@@ -185,6 +170,21 @@ class TestArgParser(object):
     def test_secret(self):
         result = handle_options(['--secret', 'sosecret'])
         assert result.secret == 'sosecret'
+
+
+class Test_run_server(object):
+
+    def test_no_options(self, proc_runner):
+        # we can start a server (no options given)
+        out, err = proc_runner.run(run_server, args=["dropafile", ])
+        assert 'Certificate in:' in out
+        assert 'Running' in err
+
+    def test_help(self, proc_runner):
+        # we can get help from run_server()
+        out, err = proc_runner.run(run_server, args=["dropafile", "--help"])
+        assert 'show this help message and exit' in out
+        assert proc_runner.exitcode == 0
 
 
 class TestFunctional(object):
