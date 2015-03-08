@@ -50,161 +50,87 @@ def get_basic_auth_headers(username='somename', password=''):
     return headers
 
 
-def test_page_response():
-    # we can get some HTML page for any path
-    application = DropAFileApplication()
-    client = Client(application, BaseResponse)
-    headers = get_basic_auth_headers(
-        username='somename', password=application.password)
-    resp = client.get('/', headers=headers)
-    assert resp.status == '200 OK'
-    mimetype = resp.headers.get('Content-Type')
-    assert mimetype == 'text/html; charset=utf-8'
+class TestHelpers(object):
+
+    @pytest.mark.skipif(
+        not os.path.exists('/bin/echo'), reason="needs /bin/echo")
+    def test_excute_cmd(self):
+        # we can execute commands (w/o shell)
+        cmd = ["/bin/echo", "Hello $PATH"]
+        out, err = execute_cmd(cmd)
+        assert out == b'Hello $PATH\n'
+        assert err == b''
+
+    def test_create_cert(self, tmpdir):
+        # we can create x509 certs
+        path = tmpdir.dirname
+        cert_path, key_path = create_ssl_cert(path)
+        assert os.path.isfile(cert_path)
+        assert os.path.isfile(key_path)
+        shutil.rmtree(os.path.dirname(cert_path))
+
+    def test_create_cert_no_path(self):
+        # w/o a given path, one will be created for us
+        cert_path, key_path = create_ssl_cert()
+        assert os.path.isfile(cert_path)
+        shutil.rmtree(os.path.dirname(cert_path))
+
+    def test_get_random_password(self):
+        # we can get a random password
+        allowed_chars = '[A-HJ-NP-Z2-9a-hjkmnp-z]'
+        RE_PWD = re.compile('^%s+$' % allowed_chars)
+        password = get_random_password()
+        assert RE_PWD.match(password)
+
+    def test_get_random_password_entropy(self):
+        # the entropy delivered by default >= 128 bits
+        unique_chars = ''.join(list(set(ALLOWED_PWD_CHARS)))
+        entropy_per_char = math.log(len(unique_chars)) / math.log(2)
+        password = get_random_password()
+        assert len(password) * entropy_per_char >= 128
 
 
-def test_get_js():
-    # we can get the dropzonejs JavaScript
-    application = DropAFileApplication()
-    client = Client(application, BaseResponse)
-    headers = get_basic_auth_headers(
-        username='somename', password=application.password)
-    resp = client.get('dropzone.js', headers=headers)
-    assert resp.status == '200 OK'
-    mimetype = resp.headers.get('Content-Type')
-    assert mimetype == 'text/javascript; charset=utf-8'
+class TestApp(object):
+    # no browser tests here
 
+    def test_app_has_password(self):
+        # DropAFileApplications have a password
+        app = DropAFileApplication()
+        assert hasattr(app, 'password')
+        assert len(app.password) > 5
 
-def test_get_css():
-    # we can get the dropzonejs CSS
-    application = DropAFileApplication()
-    client = Client(application, BaseResponse)
-    headers = get_basic_auth_headers(
-        username='somename', password=application.password)
-    resp = client.get('dropzone.css', headers=headers)
-    assert resp.status == '200 OK'
-    mimetype = resp.headers.get('Content-Type')
-    assert mimetype == 'text/css; charset=utf-8'
+    def test_app_accepts_passwod(self):
+        # DropAFileApps accept passwords passed in
+        app = DropAFileApplication(password='verysecret')
+        assert app.password == 'verysecret'
 
+    def test_check_auth_requires_auth(self):
+        # we require at least some creds to authenticate
+        app = DropAFileApplication()
+        app.password = 'sosecret'
+        env = create_environ()
+        request = Request(env)
+        assert app.check_auth(request) is False
 
-def test_send_file():
-    # we can send files
-    application = DropAFileApplication()
-    client = Client(application, BaseResponse)
-    headers = get_basic_auth_headers(
-        username='somename', password=application.password)
-    resp = client.post(
-        '/index.html',
-        headers=headers,
-        data={
-            'file': (BytesIO(b'Some Content'), 'sample.txt'),
-            },
-        )
-    assert resp.status == '200 OK'
-    uploaded_path = os.path.join(application.upload_dir, 'sample.txt')
-    assert os.path.isfile(uploaded_path)
+    def test_check_auth_wrong_passwd(self):
+        # of course check_auth requires the correct password
+        app = DropAFileApplication()
+        app.password = 'sosecret'
+        env = create_environ()
+        env.update(HTTP_AUTHORIZATION=encode_creds(
+            username='somename', password='wrong-password'))
+        request = Request(env)
+        assert app.check_auth(request) is False
 
-
-@pytest.mark.skipif(
-    not os.path.exists('/bin/echo'), reason="needs /bin/echo")
-def test_excute_cmd():
-    # we can execute commands (w/o shell)
-    cmd = ["/bin/echo", "Hello $PATH"]
-    out, err = execute_cmd(cmd)
-    assert out == b'Hello $PATH\n'
-    assert err == b''
-
-
-def test_create_cert(tmpdir):
-    # we can create x509 certs
-    path = tmpdir.dirname
-    cert_path, key_path = create_ssl_cert(path)
-    assert os.path.isfile(cert_path)
-    assert os.path.isfile(key_path)
-    shutil.rmtree(os.path.dirname(cert_path))
-
-
-def test_create_cert_no_path():
-    # w/o a given path, one will be created for us
-    cert_path, key_path = create_ssl_cert()
-    assert os.path.isfile(cert_path)
-    shutil.rmtree(os.path.dirname(cert_path))
-
-
-def test_get_random_password():
-    # we can get a random password
-    allowed_chars = '[A-HJ-NP-Z2-9a-hjkmnp-z]'
-    RE_PWD = re.compile('^%s+$' % allowed_chars)
-    password = get_random_password()
-    assert RE_PWD.match(password)
-
-
-def test_get_random_password_entropy():
-    # the entropy delivered by default >= 128 bits
-    unique_chars = ''.join(list(set(ALLOWED_PWD_CHARS)))
-    entropy_per_char = math.log(len(unique_chars)) / math.log(2)
-    password = get_random_password()
-    assert len(password) * entropy_per_char >= 128
-
-
-def test_app_has_password():
-    # DropAFileApplications have a password
-    app = DropAFileApplication()
-    assert hasattr(app, 'password')
-    assert len(app.password) > 5
-
-
-def test_app_accepts_passwod():
-    # DropAFileApps accept passwords passed in
-    app = DropAFileApplication(password='verysecret')
-    assert app.password == 'verysecret'
-
-
-def test_unauthorized_by_default():
-    # By default we get an Unauthorized message
-    app = DropAFileApplication()
-    client = Client(app, BaseResponse)
-    resp = client.get('/')
-    assert resp.status == '401 UNAUTHORIZED'
-
-
-def test_basic_auth_req_by_default():
-    # By default we require basic auth from client
-    app = DropAFileApplication()
-    client = Client(app, BaseResponse)
-    resp = client.get('/')
-    header = resp.headers.get('WWW-Authenticate', None)
-    assert header is not None
-
-
-def test_check_auth_requires_auth():
-    # we require at least some creds to authenticate
-    app = DropAFileApplication()
-    app.password = 'sosecret'
-    env = create_environ()
-    request = Request(env)
-    assert app.check_auth(request) is False
-
-
-def test_check_auth_wrong_passwd():
-    # of course check_auth requires the correct password
-    app = DropAFileApplication()
-    app.password = 'sosecret'
-    env = create_environ()
-    env.update(HTTP_AUTHORIZATION=encode_creds(
-        username='somename', password='wrong-password'))
-    request = Request(env)
-    assert app.check_auth(request) is False
-
-
-def test_check_auth_correct_passwd():
-    # the correct password can be seen.
-    app = DropAFileApplication()
-    app.password = 'sosecret'
-    env = create_environ()
-    env.update(HTTP_AUTHORIZATION=encode_creds(
-        username='somename', password='sosecret'))
-    request = Request(env)
-    assert app.check_auth(request) is True
+    def test_check_auth_correct_passwd(self):
+        # the correct password can be seen.
+        app = DropAFileApplication()
+        app.password = 'sosecret'
+        env = create_environ()
+        env.update(HTTP_AUTHORIZATION=encode_creds(
+            username='somename', password='sosecret'))
+        request = Request(env)
+        assert app.check_auth(request) is True
 
 
 class Test_run_server(object):
@@ -259,3 +185,72 @@ class TestArgParser(object):
     def test_secret(self):
         result = handle_options(['--secret', 'sosecret'])
         assert result.secret == 'sosecret'
+
+
+class TestFunctional(object):
+    # Functional browser tests
+
+    def test_page_response(self):
+        # we can get some HTML page for any path
+        application = DropAFileApplication()
+        client = Client(application, BaseResponse)
+        headers = get_basic_auth_headers(
+            username='somename', password=application.password)
+        resp = client.get('/', headers=headers)
+        assert resp.status == '200 OK'
+        mimetype = resp.headers.get('Content-Type')
+        assert mimetype == 'text/html; charset=utf-8'
+
+    def test_get_js(self):
+        # we can get the dropzonejs JavaScript
+        application = DropAFileApplication()
+        client = Client(application, BaseResponse)
+        headers = get_basic_auth_headers(
+            username='somename', password=application.password)
+        resp = client.get('dropzone.js', headers=headers)
+        assert resp.status == '200 OK'
+        mimetype = resp.headers.get('Content-Type')
+        assert mimetype == 'text/javascript; charset=utf-8'
+
+    def test_get_css(self):
+        # we can get the dropzonejs CSS
+        application = DropAFileApplication()
+        client = Client(application, BaseResponse)
+        headers = get_basic_auth_headers(
+            username='somename', password=application.password)
+        resp = client.get('dropzone.css', headers=headers)
+        assert resp.status == '200 OK'
+        mimetype = resp.headers.get('Content-Type')
+        assert mimetype == 'text/css; charset=utf-8'
+
+    def test_send_file(self):
+        # we can send files
+        application = DropAFileApplication()
+        client = Client(application, BaseResponse)
+        headers = get_basic_auth_headers(
+            username='somename', password=application.password)
+        resp = client.post(
+            '/index.html',
+            headers=headers,
+            data={
+                'file': (BytesIO(b'Some Content'), 'sample.txt'),
+                },
+            )
+        assert resp.status == '200 OK'
+        uploaded_path = os.path.join(application.upload_dir, 'sample.txt')
+        assert os.path.isfile(uploaded_path)
+
+    def test_unauthorized_by_default(self):
+        # By default we get an Unauthorized message
+        app = DropAFileApplication()
+        client = Client(app, BaseResponse)
+        resp = client.get('/')
+        assert resp.status == '401 UNAUTHORIZED'
+
+    def test_basic_auth_req_by_default(self):
+        # By default we require basic auth from client
+        app = DropAFileApplication()
+        client = Client(app, BaseResponse)
+        resp = client.get('/')
+        header = resp.headers.get('WWW-Authenticate', None)
+        assert header is not None
