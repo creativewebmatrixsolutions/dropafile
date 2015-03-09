@@ -11,6 +11,12 @@ Drop me a file, securely.
 
 `dropafile` provides a webapp where users can drop files.
 
+It is meant as a channel to deliver documents in a not too unsecure
+manner. For instance as a quickly installable workaround if people are
+not able or willing to use GnuPG or similar, although they have
+sensible documents to send.
+
+
 Install
 -------
 
@@ -29,18 +35,15 @@ then, start the local server::
    * Running on https://localhost:8443/ (Press CTRL+C to quit)
 
 The server will provide SSL. Users can access `dropafile` sevice
-pointing their browsers to the location given. They will have to
-provide the password displayed (which changes with restart).
-
-`dropafile` is meant as a channel to deliver documents in a not too
-unsecure manner. For instance as a quickly installable workaround if
-people are not able or willing to use GnuPG or similar, although they
-have sensible documents to send.
+pointing their browsers to the location given. The page is protected
+by basic auth. Users will have to provide an arbitrary user name and
+the password displayed on the commandline at startup (which changes
+with restart).
 
 The `--help` option will display all available options::
 
   $ dropfile --help
-  usage: dropafile [-h] [--host HOST] [-p PORT]
+  usage: dropafile [-h] [--host HOST] [-p PORT] [-s PASSWORD]
 
   Start dropafile app.
 
