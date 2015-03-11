@@ -35,6 +35,9 @@ PATH_MAP = {
     }
 
 
+STATIC_DIR = os.path.join(os.path.dirname(__file__), 'static')
+
+
 #: Chars allowed in passwords.
 #: We allow plain ASCII chars and numbers, with some entitites removed,
 #: that can be easily mixed up: letter `l` and number one, for instance.
@@ -141,9 +144,7 @@ class DropAFileApplication(object):
         if path not in PATH_MAP.keys():
             path = '/index.html'
         filename, mimetype = PATH_MAP[path]
-        with open(
-                os.path.join(os.path.dirname(__file__), 'static', filename)
-            ) as fd:
+        with open(os.path.join(STATIC_DIR, filename)) as fd:
             page = fd.read()
         return Response(page, mimetype=mimetype)
 
