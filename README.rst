@@ -16,6 +16,8 @@ manner. For instance as a quickly installable workaround if people are
 not able or willing to use GnuPG or similar, although they have
 sensible documents to send.
 
+`dropafile` is written in Python (server parts) and uses the
+`dropzonejs`_ JavaScript library (client parts).
 
 Install
 -------
@@ -87,3 +89,4 @@ run by::
 
 
 .. _virtualenv: https://virtualenv.pypa.io/
+.. _dropzonejs: http://www.dropzonejs.com/
