@@ -18,6 +18,7 @@
 import argparse
 import os
 import random
+import pkg_resources
 import ssl
 import subprocess
 import sys
@@ -25,6 +26,10 @@ import tempfile
 from werkzeug import secure_filename
 from werkzeug.serving import run_simple
 from werkzeug.wrappers import Request, Response
+
+
+#: Official version
+__version__ = pkg_resources.get_distribution('dropafile').version
 
 
 PATH_MAP = {

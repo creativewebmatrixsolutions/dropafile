@@ -14,7 +14,7 @@
 
 import sys
 import os
-import pkg_resources
+import dropafile
 
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
@@ -60,7 +60,7 @@ copyright = '2015, Uli Fouquet'
 # built documents.
 #
 # The full version, including alpha/beta/rc tags.
-release = pkg_resources.get_distribution('dropafile').version
+release = dropafile.__version__
 # The short X.Y version.
 version = release
 
