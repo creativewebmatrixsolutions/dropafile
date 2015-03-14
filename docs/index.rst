@@ -10,6 +10,7 @@
    :maxdepth: 3
 
    apiref
+   license
    changes
 
 .. include:: ../README.rst
