@@ -9,7 +9,8 @@ Drop me a file, securely.
 .. _build-status: https://travis-ci.org/ulif/dropafile
 
 
-`dropafile` provides a webapp where users can drop files.
+`dropafile` provides an HTTPS-secured webapp where users can drop
+files.
 
 It is meant as a channel to deliver documents in a not too unsecure
 manner. For instance as a quickly installable workaround if people are
@@ -57,6 +58,9 @@ The `--help` option will display all available options::
     -s PASSWORD, --secret PASSWORD
                           Password to access dropafile. If none is given we
                           generate one.
+
+Whenever a user sends a file, the path is displayed on the
+commandline.
 
 
 Developer Install
