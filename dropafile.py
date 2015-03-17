@@ -40,8 +40,6 @@ PATH_MAP = {
     }
 
 
-#: The directory where static content (.js, .css, HTML templates) are
-#: stored.
 STATIC_DIR = os.path.join(os.path.dirname(__file__), 'static')
 
 
