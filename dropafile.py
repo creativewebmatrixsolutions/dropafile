@@ -13,7 +13,7 @@
 #
 #    You should have received a copy of the GNU General Public License
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
-"""Drop a file on a webpage.
+"""dropafile - Drop a file on a webpage.
 """
 import argparse
 import os
@@ -40,6 +40,8 @@ PATH_MAP = {
     }
 
 
+#: The directory where static content (.js, .css, HTML templates) are
+#: stored.
 STATIC_DIR = os.path.join(os.path.dirname(__file__), 'static')
 
 
@@ -51,6 +53,12 @@ ALLOWED_PWD_CHARS = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789abcdefghjkmnpqrstuvwxyz'
 
 def handle_options(args):
     """Handle commandline options.
+
+    Expects the arguments passed to dropafile as a list of
+    arguments. `args` is expected to represent ``sys.argv[1:]``,
+    i.e. the arguments when called, without the programme name.
+
+    Returns parsed options as provided by :mod:`argparse`.
     """
     parser = argparse.ArgumentParser(description="Start dropafile app.")
     parser.add_argument(
@@ -89,13 +97,26 @@ def get_random_password():
 
 
 class DropAFileApplication(object):
+    """Drop-A-File application.
+
+    A `werkzeug` based WSGI application providing a basic-auth
+    protected web interface for file uploads.
+
+    `password` is required to access the application's service. If
+    none is provided, we generate one for you.
+
+    `upload_dir` is the directory, where we store files uploaded by
+    users. If none is given we create a temporary directory on
+    start-up. Please note: the directory is not removed on shutdown.
+    """
+
+    #: the password we require (no username neccessary)
+    password = None
+
+    #: a path where we store files uploaded by users.
+    upload_dir = None
 
     def __init__(self, password=None, upload_dir=None):
-        """Drop-A-File application.
-
-        `password` is required to access the application's service. If
-        none is provided, we generate one for you.
-        """
         if password is None:
             password = get_random_password()
         self.password = password
@@ -106,7 +127,11 @@ class DropAFileApplication(object):
     def check_auth(self, request):
         """Check basic auth against local password.
 
-        We accept all usernames, but only _the_ password.
+        We accept any username, but only *the* one password. Returns
+        ``True`` in case of success, ``False`` otherwise.
+
+        `request` must contain basic-auth authorization headers (as
+        set by browsers) to succeed.
         """
         auth = request.authorization
         if auth is None:
@@ -117,6 +142,10 @@ class DropAFileApplication(object):
 
     def authenticate(self):
         """Send 401 requesting basic auth from client.
+
+        Send back 401 response to client. Contains some HTML to
+        display an 'Unauhorized' page. Should make browsers ask users
+        for username and password.
         """
         return Response(
             '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">\n'
@@ -128,7 +157,7 @@ class DropAFileApplication(object):
             )
 
     def handle_uploaded_files(self, request):
-        """Look for a upload file in `request`.
+        """Look for an upload file in `request`.
 
         If one is found, it is saved to `self.upload_dir`.
         """
@@ -173,7 +202,32 @@ def execute_cmd(cmd_list):
 
 def create_ssl_cert(path=None, bits=4096, days=2, cn='localhost',
                     country='US', state='', location=''):
-    """Create an SSL cert and key in directory `path`.
+    """Create an SSL RSA cert and key in directory `path`.
+
+    Returns a tuple `(certificate_path, key_path)`.
+
+    `path`
+      A directory, where certificate and key can be stored. If none is
+      given, we create a temporary one.
+
+    Default attribute values of the certificate are read from a
+    package-local SSL configuration file ``openssl.conf``.
+
+
+    Some attribute values can be overridden:
+
+    `bits`
+      number of bits of the key.
+
+    `days`
+      number of days of validity of the generated certificate.
+
+    `cn`
+      Common Name. Put the domain under which the app will be
+      served in here.
+
+    `state` and `location`
+      will be empty by default.
     """
     print("Creating temporary self-signed SSL certificate...")
     if path is None:
@@ -216,6 +270,16 @@ def get_ssl_context(cert_path=None, key_path=None):
 
 
 def run_server(args=None):
+    """Run a `werkzeug` server, serving a :class:`DropAFileApplication`.
+
+    Called when running `dropafile` from commandline. Serves a
+    :class:`DropAFileApplication` instance until aborted.
+
+    Options `argv` are taken from commandline if not specified.
+
+    Generates a password and temporary SSL certificate/key on startup
+    unless otherwise requested in options/args.
+    """
     if args is None:
         args = sys.argv
     options = handle_options(args[1:])
