@@ -7,7 +7,7 @@ tests_path = os.path.join(os.path.dirname(__file__), 'tests')
 
 
 class PyTest(TestCommand):
-    user_options = []
+    user_options = [('pytest-args=', 'a', "Arguments to pass to py.test"), ]
 
     def initialize_options(self):
         TestCommand.initialize_options(self)
