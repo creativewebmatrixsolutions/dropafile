@@ -56,7 +56,7 @@ setup(
     py_modules=['dropafile', ],
     packages=[],
     namespace_packages=[],
-    long_description=read('README.rst'),
+    long_description=read('README.rst') + '\n' + read('CHANGES.rst'),
     classifiers=[
         "Development Status :: 3 - Alpha",
         "Environment :: Console",
