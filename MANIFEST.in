@@ -1,2 +1,6 @@
-include *.rst openssl.conf LICENSE COPYRIGHT
-recursive-include static *.*
+include *.rst
+include openssl.conf
+include LICENSE
+include COPYRIGHT
+include tox.ini
+recursive-include static *
