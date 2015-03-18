@@ -24,6 +24,7 @@ def read(fname):
     return open(os.path.join(os.path.dirname(__file__), fname)).read()
 
 install_requires = [
+    'argparse',
     'Werkzeug',
     ]
 
