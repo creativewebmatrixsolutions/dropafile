@@ -1,2 +1,2 @@
-include README.rst
-include *.html
+include *.rst openssl.conf LICENSE COPYRIGHT
+recursive-include static *.*
