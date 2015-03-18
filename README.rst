@@ -3,7 +3,7 @@ dropafile
 
 Drop me a file, securely.
 
-|build-status|_
+|build-status|_ | `documentation <http://dropafile.readthedocs.org/>`_ | `sources <https://github.com/ulif/dropafile>`_ | `issues <https://github.com/ulif/dropafile/issues>`_
 
 .. |build-status| image:: https://travis-ci.org/ulif/dropafile.png?branch=master
 .. _build-status: https://travis-ci.org/ulif/dropafile
@@ -12,7 +12,7 @@ Drop me a file, securely.
 `dropafile` provides an HTTPS-secured webapp where users can drop
 files.
 
-It is meant as a channel to deliver documents in a not too unsecure
+It is meant as a channel to deliver documents in a not-too-unsecure
 manner. For instance as a quickly installable workaround if people are
 not able or willing to use GnuPG or similar, although they have
 sensible documents to send.
