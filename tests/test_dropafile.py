@@ -132,6 +132,14 @@ class TestApp(object):
         request = Request(env)
         assert app.check_auth(request) is True
 
+    def test_handle_uploaded_files(self, capsys):
+        # we can send files (that are stored)
+        app = DropAFileApplication()
+        req = Request(create_environ())
+        app.handle_uploaded_files(req)
+        out, err = capsys.readouterr()
+        assert 'RECEIVED' not in out
+
 
 class TestArgParser(object):
 
@@ -193,6 +201,7 @@ class Test_run_server(object):
             run_server, args=["dropafile", "-s", "sosecret"])
         assert 'Password is: sosecret' in out
 
+    # XXX: tests for host, port here
 
 class TestFunctional(object):
     # Functional browser tests
