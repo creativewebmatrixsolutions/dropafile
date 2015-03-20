@@ -179,8 +179,7 @@ class DropAFileApplication(object):
         uploaded_file = request.files.get('file', None)
         if uploaded_file is None:
             return
-        filename = secure_filename(uploaded_file.filename)
-        path = os.path.join(self.upload_dir, filename)
+        path = get_store_path(self.upload_dir, uploaded_file.filename)
         print("RECEIVED: %s" % path)
         uploaded_file.save(path)
 
