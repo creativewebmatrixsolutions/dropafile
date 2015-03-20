@@ -9,7 +9,7 @@ import subprocess
 from contextlib import contextmanager
 from io import BytesIO
 from werkzeug.datastructures import Headers
-from werkzeug.test import Client, create_environ
+from werkzeug.test import Client, create_environ, EnvironBuilder
 from werkzeug.wrappers import BaseResponse, Request
 from dropafile import (
     DropAFileApplication, execute_cmd, create_ssl_cert, get_random_password,
@@ -132,12 +132,39 @@ class TestApp(object):
         request = Request(env)
         assert app.check_auth(request) is True
 
-    def test_handle_uploaded_files(self, capsys):
+    def test_handle_uploaded_files(self):
         # we can send files (that are stored)
+        app = DropAFileApplication()
+        builder = EnvironBuilder(
+            method='POST',
+            data={'file': (BytesIO(b'foo'), 'test.txt')}
+            )
+        req = Request(builder.get_environ())
+        app.handle_uploaded_files(req)
+        expected_path = os.path.join(app.upload_dir, 'test.txt')
+        assert os.path.isfile(expected_path)
+        assert open(expected_path, 'r').read() == 'foo'
+
+    def test_handle_uploaded_files_output(self, capsys):
+        # sent files are listed on commandline
+        app = DropAFileApplication()
+        builder = EnvironBuilder(
+            method='POST',
+            data={'file': (BytesIO(b'foo'), 'test.txt')}
+            )
+        req = Request(builder.get_environ())
+        app.handle_uploaded_files(req)
+        out, err = capsys.readouterr()
+        assert 'RECEIVED:' in out
+        assert 'test.txt' in out
+
+    def test_handle_uploaded_files_no_files(self, capsys):
+        # we notice if no files was sent (and do nothing)
         app = DropAFileApplication()
         req = Request(create_environ())
         app.handle_uploaded_files(req)
         out, err = capsys.readouterr()
+        assert os.listdir(app.upload_dir) == []
         assert 'RECEIVED' not in out
 
 
