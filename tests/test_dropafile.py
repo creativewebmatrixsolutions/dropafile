@@ -229,11 +229,14 @@ class TestApp(object):
         upload_path = os.path.join(app.upload_dir, 'test.txt')
         open(upload_path, 'w').write('original')
         app.handle_uploaded_files(req)
-        assert os.listdir(app.upload_dir) == ['test.txt', 'test.txt-1']
-        assert open(
-            os.path.join(app.upload_dir, 'test.txt-1'), 'r') == 'original'
-        assert open(
-            os.path.join(app.upload_dir, 'test.txt-1'), 'r') == 'uploaded'
+        assert sorted(
+            os.listdir(app.upload_dir)) == ['test.txt', 'test.txt-1']
+        contents1 = open(
+            os.path.join(app.upload_dir, 'test.txt'), 'r').read()
+        contents2 = open(
+            os.path.join(app.upload_dir, 'test.txt-1'), 'r').read()
+        assert contents1 == 'original'
+        assert contents2 == 'uploaded'
 
 
 class TestArgParser(object):
