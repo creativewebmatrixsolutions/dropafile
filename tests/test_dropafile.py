@@ -302,6 +302,7 @@ class Test_run_server(object):
 
     # XXX: tests for host, port here
 
+
 class TestFunctional(object):
     # Functional browser tests
 
