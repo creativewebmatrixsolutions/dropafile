@@ -156,7 +156,7 @@ class TestApp(object):
         app.handle_uploaded_files(req)
         assert os.listdir(app.upload_dir) == []
 
-    def test_handle_uploaded_files_multiple(self):
+    def test_handle_uploaded_files_multiple_at_once(self):
         # we only take one file, even if multiple are offered
         app = DropAFileApplication()
         builder = EnvironBuilder(
@@ -189,6 +189,23 @@ class TestApp(object):
         out, err = capsys.readouterr()
         assert os.listdir(app.upload_dir) == []
         assert 'RECEIVED' not in out
+
+    def test_handle_uploaded_files_not_overwritten(self):
+        # we do not overwrite uploaded files
+        app = DropAFileApplication()
+        builder = EnvironBuilder(
+            method='POST',
+            data={'file': (BytesIO(b'uploaded'), 'test.txt')}
+            )
+        req = Request(builder.get_environ())
+        upload_path = os.path.join(app.upload_dir, 'test.txt')
+        open(upload_path, 'w').write('original')
+        app.handle_uploaded_files(req)
+        assert os.listdir(app.upload_dir) == ['test.txt', 'test.txt-1']
+        assert open(
+            os.path.join(app.upload_dir, 'test.txt-1'), 'r') == 'original'
+        assert open(
+            os.path.join(app.upload_dir, 'test.txt-1'), 'r') == 'uploaded'
 
 
 class TestArgParser(object):
