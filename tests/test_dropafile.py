@@ -6,6 +6,7 @@ import pytest
 import re
 import shutil
 import subprocess
+import tempfile
 from contextlib import contextmanager
 from io import BytesIO
 from werkzeug.datastructures import Headers
@@ -13,7 +14,7 @@ from werkzeug.test import Client, create_environ, EnvironBuilder
 from werkzeug.wrappers import BaseResponse, Request
 from dropafile import (
     DropAFileApplication, execute_cmd, create_ssl_cert, get_random_password,
-    ALLOWED_PWD_CHARS, handle_options, run_server
+    ALLOWED_PWD_CHARS, handle_options, run_server, get_store_path
     )
 
 
@@ -88,6 +89,33 @@ class TestHelpers(object):
         entropy_per_char = math.log(len(unique_chars)) / math.log(2)
         password = get_random_password()
         assert len(password) * entropy_per_char >= 128
+
+    def test_get_store_path(self):
+        # we can get a safe storage path
+        store_dir = tempfile.mkdtemp()
+        path = get_store_path(store_dir, 'test.txt')
+        assert path == os.path.join(store_dir, 'test.txt')
+
+    def test_get_store_path_one_file_in(self):
+        # with one file in we get a modified filename
+        store_dir = tempfile.mkdtemp()
+        open(os.path.join(store_dir, 'test.txt'), 'w').write('foo')
+        path = get_store_path(store_dir, 'test.txt')
+        assert path.endswith('/test.txt-1')
+        open(path, 'w').write('foo')
+        path = get_store_path(store_dir, 'test.txt')
+        assert path.endswith('/test.txt-2')
+        open(path, 'w').write('foo')
+        path = get_store_path(store_dir, 'test.txt')
+        assert path.endswith('/test.txt-3')
+
+    def test_get_store_path_two_files_in(self):
+        # with two files in we also get a modified filename
+        store_dir = tempfile.mkdtemp()
+        open(os.path.join(store_dir, 'test.txt'), 'w').write('foo')
+        open(os.path.join(store_dir, 'test.txt-2'), 'w').write('foo')
+        path = get_store_path(store_dir, 'test.txt')
+        assert path.endswith('/test.txt-1')
 
 
 class TestApp(object):
