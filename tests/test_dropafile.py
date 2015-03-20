@@ -300,7 +300,14 @@ class Test_run_server(object):
             run_server, args=["dropafile", "-s", "sosecret"])
         assert 'Password is: sosecret' in out
 
-    # XXX: tests for host, port here
+    def test_host_and_port(self, proc_runner):
+        # we can set a custom host and port we want to bind to
+        out, err = proc_runner.run(
+            run_server, args=["dropafile",
+                              "--host", "0.0.0.0",
+                              "--port", "12345"]
+            )
+        assert "https://0.0.0.0:12345/" in err
 
 
 class TestFunctional(object):
