@@ -94,6 +94,23 @@ def get_random_password():
         [rnd.choice(ALLOWED_PWD_CHARS) for x in range(23)])
 
 
+def get_store_path(directory, filename):
+    """Get a path where we can safely store a file.
+
+    The file should be stored in `directory` under name `filename`.
+    If `filename` already exists in `directory`, we construct new
+    names by appending '-<NUM>' to the original filename, where
+    ``<NUM>`` is a number counting up.
+    """
+    filename = secure_filename(filename)
+    path = os.path.join(directory, filename)
+    num = 1
+    while os.path.exists(path):
+        path = os.path.join(directory, '%s-%s' % (filename, num))
+        num += 1
+    return path
+
+
 class DropAFileApplication(object):
     """Drop-A-File application.
 
