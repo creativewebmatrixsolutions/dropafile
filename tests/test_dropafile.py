@@ -145,6 +145,29 @@ class TestApp(object):
         assert os.path.isfile(expected_path)
         assert open(expected_path, 'r').read() == 'foo'
 
+    def test_handle_uploaded_files_wrong_formfield_name(self):
+        # only files with form-name 'file' are considered
+        app = DropAFileApplication()
+        builder = EnvironBuilder(
+            method='POST',
+            data={'not_file': (BytesIO(b'foo'), 'test.txt')}
+            )
+        req = Request(builder.get_environ())
+        app.handle_uploaded_files(req)
+        assert os.listdir(app.upload_dir) == []
+
+    def test_handle_uploaded_files_multiple(self):
+        # we only take one file, even if multiple are offered
+        app = DropAFileApplication()
+        builder = EnvironBuilder(
+            method='POST',
+            data={'file': (BytesIO(b'foo'), 'test.txt'),
+                  'file2': (BytesIO(b'bar'), 'test2.txt')}
+            )
+        req = Request(builder.get_environ())
+        app.handle_uploaded_files(req)
+        assert os.listdir(app.upload_dir) == ['test.txt']
+
     def test_handle_uploaded_files_output(self, capsys):
         # sent files are listed on commandline
         app = DropAFileApplication()
