@@ -53,8 +53,8 @@ setup(
     license="GPL 3.0",
     keywords="web drop file wsgi",
     url="https://github.com/ulif/dropafile/",
-    py_modules=['dropafile', ],
-    packages=[],
+    py_modules=[],
+    packages=['dropafile', ],
     namespace_packages=[],
     long_description=read('README.rst') + '\n' + read('CHANGES.rst'),
     classifiers=[
