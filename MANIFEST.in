@@ -1,6 +1,6 @@
 include *.rst
-include openssl.conf
 include LICENSE
 include COPYRIGHT
 include tox.ini
-recursive-include static *
+include dropafile/openssl.conf
+recursive-include dropafile/static *
