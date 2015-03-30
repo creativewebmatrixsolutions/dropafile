@@ -1,8 +1,8 @@
 Changes
 =======
 
-0.2 (unreleased)
-----------------
+0.1.1 (2015-03-30)
+------------------
 
 - Turned former `dropafile` module into a Python package. This is to
   fix installation behvior where data files are installed in different

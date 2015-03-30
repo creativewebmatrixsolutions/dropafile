@@ -45,7 +45,7 @@ docs_require = [
 
 setup(
     name="dropafile",
-    version="0.2.dev0",
+    version="0.1.1",
     author="Uli Fouquet",
     author_email="uli@gnufix.de",
     description=(
