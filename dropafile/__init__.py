@@ -192,8 +192,8 @@ class DropAFileApplication(object):
         if path not in PATH_MAP.keys():
             path = '/index.html'
         filename, mimetype = PATH_MAP[path]
-        with open(os.path.join(STATIC_DIR, filename)) as fd:
-            page = fd.read()
+        with open(os.path.join(STATIC_DIR, filename)) as file_descr:
+            page = file_descr.read()
         return Response(page, mimetype=mimetype)
 
 
