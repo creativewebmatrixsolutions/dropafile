@@ -188,10 +188,8 @@ class DropAFileApplication(object):
         if not self.check_auth(request):
             return self.authenticate()
         self.handle_uploaded_files(request)
-        path = request.path
-        if path not in PATH_MAP.keys():
-            path = '/index.html'
-        filename, mimetype = PATH_MAP[path]
+        filename, mimetype = PATH_MAP.get(
+            request.path, PATH_MAP['/index.html'])
         with open(os.path.join(STATIC_DIR, filename)) as file_descr:
             page = file_descr.read()
         return Response(page, mimetype=mimetype)
